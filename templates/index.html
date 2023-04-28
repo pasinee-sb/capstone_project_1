@@ -1,8 +1,36 @@
 {%extends 'base.html' %}
 
 {%block content%}
-<h1>PITHA: {{score1}}</h1>
 
-<h1>PRAYUTH {{score2}}</h1>
+<h1>Add Keyword For Sentiment Analysis</h1>
+
+<form method="POST" id="add_keyword" action="/add">
+
+    {{ form.hidden_tag() }}
+  
+    {% for field in form
+      if field.widget.input_type != 'hidden' %}
+    <p>
+        {#
+      {{ field.label }}
+      #}
+      {{ field(class_="form-control, kw") }}
+  
+      {% for error in field.errors %}
+      <span class="form-text text-danger">{{ error }}</span>
+      {% endfor %}
+    </p>
+    {% endfor %}
+  
+    <button type="submit" class="btn btn-primary"  >Add</button>
+  
+  </form>
+
+
+  <ul id="keyword_list">
+    <li></li>
+  </ul>
+
+
 
 {%endblock%}

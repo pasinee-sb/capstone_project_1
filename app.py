@@ -1,21 +1,22 @@
-
-from polling import get_query
-from textblob import TextBlob
-import preprocessor as p
-from statistics import mean
+from polling import generate_sentiment
 from typing import List
-from flask import Flask, redirect, render_template, flash, make_response
+from flask import Flask, redirect, render_template, flash, make_response, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-import csv
-
+from models import User, AnalysisCard, db, connect_db, Keyword, AnalysisCardKeyword
+from forms import KeywordForm
+import os
 
 app = Flask(__name__)
+app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
 app.app_context().push()
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///twitter-poll'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///reddit-poll'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
-# connect_db(app)
+
+# connect to database
+connect_db(app)
 
 
 app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
@@ -28,35 +29,32 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
 
 
-def get_sentiment(all_posts: List[str]) -> List[float]:
-    sentiment_scores = []
-    for post in all_posts:
-        blob = TextBlob(post)
-        sentiment_scores.append(blob.sentiment.polarity)
-        # sentiment_scores.append(blob)
-        # print(sentiment_scores)
-    return sentiment_scores
-
-
-# # def generate_average_sentiment_score(keyword: str) -> int:
-def get_mean_score(scores):
-
-    average_score = mean(scores)
-    return average_score
-
-
-def generate_sentiment(name):
-    all_posts = get_query(name)
-    sentiment_scores = get_sentiment(all_posts)
-    mean_score = get_mean_score(sentiment_scores)
-    return (mean_score)
-
-
 @app.route('/')
-def show_home():
-    score1 = generate_sentiment("pitha")
-    score2 = generate_sentiment("prayuth")
+def home():
+    form = KeywordForm()
+    return render_template('index.html', form=form)
 
-    # second = generate_average_sentiment_score("prayuth")
 
-    return render_template('index.html', score1=score1, score2=score2)
+@app.route('/add', methods=['GET', 'POST'])
+def add_keyword():
+    # score1 = generate_sentiment("pitha")
+    # score2 = generate_sentiment("paetongtarn")
+
+    # if there are existing keywords, render them
+    keywords = Keyword.query.all()
+    all_words = [keyword.serialize() for keyword in keywords]
+    print("#########################################")
+    print(keywords)
+
+    form = KeywordForm()
+
+    if form.validate_on_submit():
+        word = request.json["word"]
+        keyword = Keyword(word=word)
+        db.session.add(keyword)
+        db.session.commit()
+
+        response_json = jsonify(word=keyword.serialize())
+        return (response_json, 201)
+
+    return jsonify(words=all_words)
