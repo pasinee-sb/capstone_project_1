@@ -2,19 +2,18 @@
 
 {%block content%}
 
-<h1>Add Keyword For Sentiment Analysis</h1>
-
-<form method="POST" id="add_keyword" action="/add">
+<div class="container">
+<form method="POST" id="add_keyword_form" >
 
     {{ form.hidden_tag() }}
   
     {% for field in form
       if field.widget.input_type != 'hidden' %}
     <p>
-        {#
+       
       {{ field.label }}
-      #}
-      {{ field(class_="form-control, kw") }}
+      
+      {{ field(class_="form-control") }}
   
       {% for error in field.errors %}
       <span class="form-text text-danger">{{ error }}</span>
@@ -22,13 +21,14 @@
     </p>
     {% endfor %}
   
-    <button type="submit" class="btn btn-primary"  >Add</button>
+    <input id="word_submit_button" type="submit" class="btn btn-primary" >
   
   </form>
+</div>
 
 
   <ul id="keyword_list">
-    <li></li>
+  
   </ul>
 
 

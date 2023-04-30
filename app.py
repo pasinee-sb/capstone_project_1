@@ -1,10 +1,12 @@
 from polling import generate_sentiment
 from typing import List
-from flask import Flask, redirect, render_template, flash, make_response, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, AnalysisCard, db, connect_db, Keyword, AnalysisCardKeyword
-from forms import KeywordForm
+from forms import KeywordForm, UserForm
 import os
+
+CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
@@ -28,33 +30,52 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
 
+##############################################################################
+# User signup/login/logout
 
-@app.route('/')
+#    @app.before_request""" is a decorator in Flask that registers a function to be called before each request
+# is processed by the server. This can be used to perform tasks that
+#  should be done for every request, such as setting up a database connection,
+# checking if the user is logged in, or modifying the request object."""
+
+
+@app.before_request
+def add_user_to_g():
+    """If we're logged in, add curr user to Flask global."""
+
+    if CURR_USER_KEY in session:
+
+        # The g object in Flask is a global object that can be used to store data during the lifetime of a request.
+        # It is often used to store objects that need to be accessed by multiple functions during the handling of a request.
+        # The g object is specific to each request and is not shared between different requests.
+        # It is created at the start of a request and destroyed at the end of the request.
+        g.user = User.query.get(session[CURR_USER_KEY])
+
+    else:
+
+        g.user = None
+
+
+def do_login(user):
+    """Log in user."""
+
+    session[CURR_USER_KEY] = user.id
+
+
+def do_logout():
+    """Logout user."""
+
+    if CURR_USER_KEY in session:
+
+        del session[CURR_USER_KEY]
+
+
+@app.route('/', method=['GET', 'POST'])
 def home():
-    form = KeywordForm()
-    return render_template('index.html', form=form)
-
-
-@app.route('/add', methods=['GET', 'POST'])
-def add_keyword():
-    # score1 = generate_sentiment("pitha")
-    # score2 = generate_sentiment("paetongtarn")
-
-    # if there are existing keywords, render them
-    keywords = Keyword.query.all()
-    all_words = [keyword.serialize() for keyword in keywords]
-    print("#########################################")
-    print(keywords)
-
-    form = KeywordForm()
-
+    form = UserForm()
     if form.validate_on_submit():
-        word = request.json["word"]
-        keyword = Keyword(word=word)
-        db.session.add(keyword)
-        db.session.commit()
+        user = User.signup(username=form.username.data,
+                           password=form.password.data)
+        return redirect(f"/user/{user.id}")
 
-        response_json = jsonify(word=keyword.serialize())
-        return (response_json, 201)
-
-    return jsonify(words=all_words)
+    return render_template('register.html', form=form)
