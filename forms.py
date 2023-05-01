@@ -3,7 +3,7 @@
 from wtforms import SelectField
 from flask_wtf import FlaskForm
 from wtforms_alchemy import ModelForm, model_form_factory
-from models import User, SentimentAnalysis, AnalysisCard, AnalysisCardKeyword, Keyword, db
+from models import User, SentimentScore, Keyword, db
 
 BaseModelForm = model_form_factory(FlaskForm)
 

@@ -2,7 +2,7 @@ from polling import generate_sentiment
 from typing import List
 from flask import Flask, request, jsonify, render_template, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
-from models import User, AnalysisCard, db, connect_db, Keyword, AnalysisCardKeyword
+from models import User, AnalysisCard, db, connect_db, Keyword, SentimentScore, Auth
 from forms import KeywordForm, UserForm
 import os
 
@@ -70,12 +70,14 @@ def do_logout():
         del session[CURR_USER_KEY]
 
 
-@app.route('/', method=['GET', 'POST'])
-def home():
-    form = UserForm()
-    if form.validate_on_submit():
-        user = User.signup(username=form.username.data,
-                           password=form.password.data)
-        return redirect(f"/user/{user.id}")
+# @app.route('/', method=['GET', 'POST'])
+# def home():
+#     form = UserForm()
+#     if form.validate_on_submit():
+#         try:
 
-    return render_template('register.html', form=form)
+#             user = User.register(username=form.username.data,
+#                            password=form.password.data)
+#         return redirect(f"/user/{user.id}")
+
+#     return render_template('register.html', form=form)
