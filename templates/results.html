@@ -1,0 +1,22 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<table>
+
+<tr>
+    {%for result in results%}
+    
+    <td>{{result}}</td>
+    {%endfor%}
+</tr>
+   <tr>
+    {%for word in selected_keywords%}
+    <td>
+{{word}}
+    </td>
+    {%endfor%}
+</tr>
+</table>
+
+
+{%endblock%}

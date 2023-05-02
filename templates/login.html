@@ -3,7 +3,7 @@
 {%block content%}
 
 <div class="container">
-<form method="POST"  >
+<form method="POST" action="/login" >
 
     {{ form.hidden_tag() }}
   
@@ -12,27 +12,23 @@
        
       {{ form.username.label }}
       {{form.username (class_="form-control")}} </p>
-     <p> {{ form.password.label }}
-      {{form.password (class_="form-control")}}</p>
-      <p>{{ form.email.label }}
-      {{form.email (class_="form-control")}}</p>
-      
+     <p> password
+      {{form.password(class_="form-control")}}</p>
+     
       {% for field in form
         if field.widget.input_type != 'hidden' %}
-        
   
       {% for error in field.errors %}
       <span class="form-text text-danger">{{ error }}</span>
       {% endfor %}
    
     {% endfor %}
+    
   
-    <input  type="submit" class="btn btn-primary" >
+    <input type="submit" class="btn btn-primary" >
   
   </form>
 </div>
-
-
 
 
 

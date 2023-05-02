@@ -77,7 +77,7 @@ def get_sentiment(all_posts: List[str]) -> List[float]:
 def get_mean_score(scores):
 
     average_score = mean(scores)
-    return average_score
+    return round(average_score, 2)
 
 
 def generate_sentiment(name):

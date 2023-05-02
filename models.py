@@ -85,7 +85,7 @@ class AnalysisCard(db.Model):
 
     def __repr__(self):
         c = self
-        return f"<AnalysisCard id = {c.id} user_id = {c.user_id} >"
+        return f"<AnalysisCard id = {c.id} user_id = {c.user_id} analyis_theme={c.analysis_theme} >"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     analysis_theme = db.Column(db.String)

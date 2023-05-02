@@ -1,0 +1,43 @@
+{%extends 'base.html'%}
+
+{%block content%}
+
+<p> user_id : {{g.user.id}} username : {{g.user.username}}</p>
+<ul>
+   <p><b> Saved Sentiment Analysis</b></p>
+{%for card in cards%}
+ <li><a href="/users/{{g.user.id}}/{{card.id}}">{{card.analysis_theme}}</a></li>
+{%endfor%}
+</ul>
+
+
+
+  <hr>
+
+  <h2>Add Keyword</h2>
+  <form " action="{{ url_for('add_keyword') }}">
+    {{ add_keyword_form.hidden_tag() }}
+    {{ add_keyword_form.word(class="form-control") }}
+    <button type="submit">Submit</button>
+  </form>
+
+  
+
+
+
+  <h1>CHECK KEYWORDS TO ANALYZE</h1>
+  <form method="post" action="{{ url_for('analyze') }}">
+    <ul>
+      {% for word in session['keywords'] %}
+      <li>
+        <label>
+          <input type="checkbox" name="keywords[]" value="{{ word }}">
+          {{ word }}
+        </label>
+        <button type="submit" formaction="{{ url_for('remove_keyword', keyword=word) }}">Remove</button>
+      </li>
+      {% endfor %}
+    </ul>
+    <button type="submit">Analyze</button>
+  </form>
+{%endblock%}
