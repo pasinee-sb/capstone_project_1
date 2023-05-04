@@ -313,11 +313,18 @@ def user_profile(user_id):
         form = UserEditForm(obj=g.user)
 
         if form.validate_on_submit():
-            g.user.username = form.username.data
-            g.user.email = form.email.data
-            db.session.commit()
-            flash("User edited", "success")
-            return redirect('/')
+            user = User.authenticate(g.user.username, form.password.data)
+
+            if user:
+                g.user.username = form.username.data
+                g.user.email = form.email.data
+                db.session.commit()
+                flash("User edited", "success")
+                return redirect('/')
+
+            else:
+                flash("Edit unauthorized", "danger")
+                return redirect('/')
 
         return render_template('edit_user.html', form=form)
 
@@ -328,11 +335,16 @@ def user_profile(user_id):
 @app.route('/users/<int:user_id>/delete', methods=['POST'])
 def delete_user(user_id):
     if g.user.id == user_id:
-        do_logout()
-        db.session.delete(g.user)
-        db.session.commit()
-        flash("we are sad to see you go", "danger")
-        return redirect("/")
+        user = User.authenticate(g.user.username, request.form.get('password'))
+        if user:
+            do_logout()
+            db.session.delete(g.user)
+            db.session.commit()
+            flash("We are sorry to see you go", "danger")
+            return redirect("/")
+        else:
+            flash("Re-type password to delete user", "danger")
+            return redirect(f"/users/{user_id}/profile")
     else:
         flash("You are not authorized to delete this user.", "danger")
         return redirect("/")
