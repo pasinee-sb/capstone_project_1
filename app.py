@@ -67,8 +67,7 @@ def do_logout():
 
     if CURR_USER_KEY in session:
 
-        del session[CURR_USER_KEY]
-        del session['keywords']
+        session.clear()
 
 
 @app.route('/')
@@ -118,14 +117,14 @@ def signup():
 
 
 @app.route('/users/<int:user_id>')
-def dashboard(user_id):
+def machine(user_id):
     if g.user.id == user_id:
         cards = AnalysisCard.query.filter_by(user_id=user_id).all()
 
         add_keyword_form = KeywordForm()
         form = AnalyzeForm()
 
-        return render_template('dashboard.html', cards=cards, add_keyword_form=add_keyword_form, form=form)
+        return render_template('machine.html', cards=cards, add_keyword_form=add_keyword_form, form=form)
 
     flash("Access not allowed", "danger")
     return redirect('/')
@@ -157,7 +156,7 @@ def log_out():
     do_logout()
 
     flash("See you later!", "success")
-    return redirect('/login')
+    return redirect('/')
 
 
 @app.route('/add_keyword')
@@ -174,9 +173,7 @@ def add_keyword():
 @app.route('/analyze', methods=['POST'])
 def analyze():
     selected_keywords = request.form.getlist('keywords[]')
-    print("9999999999999999999999999999999999")
 
-    print(selected_keywords)
     results = []
     for word in selected_keywords:
         score = generate_sentiment(word)
@@ -191,7 +188,7 @@ def edit_keyword():
     return None
 
 
-@app.route('/remove_keyword/<keyword>', methods=['POST'])
+@app.route('/remove_keyword/<keyword>')
 def remove_keyword(keyword):
     try:
         keywords = session.get('keywords', [])
@@ -267,6 +264,17 @@ def user_profile(user_id):
             return redirect('/')
 
         return render_template('edit_user.html', form=form)
+
+    flash("Access not allowed", "danger")
+    return redirect('/')
+
+
+@app.route('/users/<int:user_id>/dashboard')
+def show_user_dashboard(user_id):
+    if g.user.id == user_id:
+        cards = AnalysisCard.query.filter_by(user_id=user_id).all()
+
+        return render_template('dashboard.html', cards=cards)
 
     flash("Access not allowed", "danger")
     return redirect('/')

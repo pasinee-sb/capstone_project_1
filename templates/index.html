@@ -2,11 +2,35 @@
 
 {%block content%}
 
-<form action="/signup">
-    <button>Signup</button>
-</form>
+<div class="container">
+<h2>What is sentiment analysis?</h2>
+<p>Sentiment analysis, also known as opinion mining, is the process of using natural language processing (NLP) and machine learning techniques to identify and extract subjective information from text data. It involves analyzing a piece of text, such as a social media post or product review, to determine whether the overall sentiment expressed is positive, negative, or neutral.</p>
 
+</div>
+
+<div class="container">
+    <h2>What does this app do?</h2>
+    <p>
+     The goal of this app is to identify whether the overall sentiment expressed in the text from keyword search on reddit.com is positive, negative, or neutral. This is achieved through TextBlob, a Python library used for natural language processing tasks.
+     </p></div>
+
+
+     <div class="container">
+        <h2>Why is it useful?</h2>
+        <p>The applications of sentiment analysis are numerous, including brand monitoring, market research, customer service, and political analysis. By analyzing the sentiment of large volumes of text data, businesses and organizations can gain insights into public opinion and make more informed decisions.</p>
+        
+        </div>
+
+     <div class="text-center">
+<form action="/signup">
+    <button class="btn btn-primary">Signup</button>
+</form>
+</div>
+<br>
+<div class="text-center">
 <form action="/login">
-    <button>Login</button>
+    <button class="btn btn-primary">Login</button>
     </form>
+
+</div>
 {%endblock%}

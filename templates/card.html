@@ -2,15 +2,17 @@
 
 {%block content%}
 
-
-<p>Analysis Theme: {{card.analysis_theme}}</p>
-
-
-<a href="/"><button>Home</button></a>
+<div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+<h3>{{card.analysis_theme}}</h3>
 
 
+<a href="/users/{{user_id}}/dashboard"><button class="btn btn-outline-secondary"> Dashboard</button></a>
 
-<table>
+</div>
+
+
+<div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+<table class="col-lg-6 w-50 mx-auto mt-2 text-center">
     <tr>
         <th> Keyword</th>
        
@@ -32,10 +34,12 @@
     {%endfor%}
 </tbody>
     </table>
+</div>
+<div class="col-lg-6 w-50 mx-auto mt-2 text-center">
     <form action="/users/{{user_id}}/cards/{{card.id}}/delete" method="post">
-        <button type="submit">Delete</button>
+        <button type="submit" class="btn btn-outline-danger">Delete</button>
     </form>
-
+</div>
 
 
 {%endblock%}

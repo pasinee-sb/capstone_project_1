@@ -1,0 +1,46 @@
+{%extends 'base.html'%}
+
+{%block content%}
+
+
+
+
+
+
+
+  <hr>
+  <div class="col-lg-6 w-50 mx-auto" >
+
+  <h2>Add Keyword</h2>
+  <form " action="{{ url_for('add_keyword') }}">
+    {{ add_keyword_form.hidden_tag() }}
+    {{ add_keyword_form.word(class="form-control") }}
+    <button type="submit" class="btn btn-info mt-2">Add</button>
+  </form>
+  <hr>
+</div>
+
+  
+
+
+{%if 'keywords' in session%}
+<div class="col-lg-6 w-50 mx-auto" >
+  <h2>Check keywords to analyze</h2>
+  <form method="post" action="{{ url_for('analyze') }}">
+    
+      {% for word in session['keywords'] %}
+      <p>
+        <label>
+          <input type="checkbox" name="keywords[]" value="{{ word }}">
+          {{ word }}
+        </label>
+        <a href="{{ url_for('remove_keyword', keyword=word) }}"><i class="fa-solid fa-trash-can text-danger"></i></a>
+      </p>
+      {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-success">Analyze</button>
+  </form>
+</div>
+
+  {%endif%}
+{%endblock%}

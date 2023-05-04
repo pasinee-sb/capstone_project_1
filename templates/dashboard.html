@@ -4,45 +4,37 @@
 
 
 {%if cards%}
-<p><b> Saved Sentiment Analysis</b></p>
-<ul>
-  
-{%for card in cards%}
- <li><a href="/users/{{g.user.id}}/cards/{{card.id}}">{{card.analysis_theme}}</a></li>
-{%endfor%}
-</ul>
-{%endif%}
 
 
-
-  <hr>
-
-  <h2>Add Keyword</h2>
-  <form " action="{{ url_for('add_keyword') }}">
-    {{ add_keyword_form.hidden_tag() }}
-    {{ add_keyword_form.word(class="form-control") }}
-    <button type="submit">Submit</button>
-  </form>
 
   
 
 
-{%if 'keywords' in session%}
-  <h1>CHECK KEYWORDS TO ANALYZE</h1>
-  <form method="post" action="{{ url_for('analyze') }}">
-    <ul>
-      {% for word in session['keywords'] %}
-      <li>
-        <label>
-          <input type="checkbox" name="keywords[]" value="{{ word }}">
-          {{ word }}
-        </label>
-        <button type="submit" formaction="{{ url_for('remove_keyword', keyword=word) }}">Remove</button>
-      </li>
-      {% endfor %}
-    </ul>
-    <button type="submit">Analyze</button>
-  </form>
+
+
+
+
+
+<div class="container mt-5">
+    <div class="row">
+        {%for card in cards%}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{card.analysis_theme}}</h5>
+            {%for card in (card.sentiment_scores | sort(attribute='score' , reverse = True))[:1] %}
+            <p class="card-text">{{card.score}} is the winning sentiment score in this category, fnd out who won this analysis</p>
+          
+            {%endfor%}
+            <a href="/users/{{g.user.id}}/cards/{{card.id}}" class="btn btn-primary">Go to {{card.analysis_theme}}</a>
+          </div>
+        
+      </div>
+    </div>
+    {%endfor%}
+  </div>
+</div>
 
   {%endif%}
+
 {%endblock%}

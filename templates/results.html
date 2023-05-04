@@ -2,10 +2,10 @@
 
 {%block content%}
 
-
+<div class="col-lg-6 w-50 mx-auto text-center" >
 <h1>Result</h1>
-  <form method="post" action="/users/{{g.user.id}}/cards">
-    <table>
+  <form method="post" action="/users/{{g.user.id}}/cards" class="col-lg-6 w-50 mx-auto text-center">
+    <table class="col-lg-6 w-50 mx-auto text-center">
         <tr>
             <th> Keyword</th>
            
@@ -27,11 +27,24 @@
         {%endfor%}
     </tbody>
         </table>
-        <input type="text" name="theme" id="" placeholder="Name result theme" required>
-    <button type="submit">Save this result</button>
-  </form>
+    </div>
 
-  <a href="/"><button >Home</button></a>
+
+    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+        <input type="text" name="theme" id="" placeholder="Name result theme" required>
+    </div>
+    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+    <button type="submit" class="btn btn-success">Save this result</button>
+        </div>
+
+   
+
+  </form>
+        <div class="col-lg-6 w-50 mx-auto mt-5 text-center">
+  <a href="/"><button class="btn btn-primary" >Home</button></a>
+        </div>
+
+ 
 
 
 {%endblock%}
