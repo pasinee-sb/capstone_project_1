@@ -325,6 +325,19 @@ def user_profile(user_id):
     return redirect('/')
 
 
+@app.route('/users/<int:user_id>/delete', methods=['POST'])
+def delete_user(user_id):
+    if g.user.id == user_id:
+        do_logout()
+        db.session.delete(g.user)
+        db.session.commit()
+        flash("we are sad to see you go", "danger")
+        return redirect("/")
+    else:
+        flash("You are not authorized to delete this user.", "danger")
+        return redirect("/")
+
+
 @ app.route('/users/<int:user_id>/dashboard')
 def show_user_dashboard(user_id):
     if g.user.id == user_id:
