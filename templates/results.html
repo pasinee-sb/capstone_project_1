@@ -30,19 +30,43 @@
     </div>
 
 
+    
+
+    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+        <p>The score represents the degree of positive or negative sentiment conveyed by the text</p> 
+        <p>  -1  : very negative sentiment</p>
+        <p> 0  : neutral sentiment,</p>
+        <p>+1  : very positive sentiment.</p>  
+      </div>
+   
+
+    {%if not g.user%}
+
+    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">  
+         
+        <a class="px-3 me-2 btn btn-primary" href="/signup" role="button">Sign up</a>
+     
+
+        <a class="px-3 me-2 btn btn-success" href="/login" role="button">Log in</a>
+      </div>
+
+    {%else%}
+
     <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
         <input type="text" name="theme" id="" placeholder="Name result theme" required>
-    </div>
-    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-    <button type="submit" class="btn btn-success">Save this result</button>
-        </div>
+        <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+            <button type="submit" class="btn btn-success">Save this result</button>
+                </div>
+   
+
+    {%endif%}
+</div>
+
+
 
    
 
   </form>
-        <div class="col-lg-6 w-50 mx-auto mt-5 text-center">
-  <a href="/"><button class="btn btn-primary" >Home</button></a>
-        </div>
 
  
 

@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
 app.app_context().push()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///reddit-poll'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///reddi-senti'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -119,12 +119,11 @@ def signup():
 @app.route('/users/<int:user_id>')
 def machine(user_id):
     if g.user.id == user_id:
-        cards = AnalysisCard.query.filter_by(user_id=user_id).all()
 
         add_keyword_form = KeywordForm()
         form = AnalyzeForm()
 
-        return render_template('machine.html', cards=cards, add_keyword_form=add_keyword_form, form=form)
+        return render_template('machine.html', add_keyword_form=add_keyword_form, form=form)
 
     flash("Access not allowed", "danger")
     return redirect('/')
@@ -167,19 +166,24 @@ def add_keyword():
     session['keywords'] = keywords
     print(keyword)
 
-    return redirect('/')
+    if g.user:
+        return redirect('/')
+    return redirect('/demo')
 
 
-@app.route('/analyze', methods=['POST'])
+@app.route('/analyze')
 def analyze():
-    selected_keywords = request.form.getlist('keywords[]')
+    selected_keywords = request.args.getlist('keywords[]')
 
     results = []
     for word in selected_keywords:
         score = generate_sentiment(word)
         results.append(score)
-    # do something with selected_keywords...
-    return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
+    if g.user:
+        return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
+    else:
+        flash("Sign up or Log in to save result", "warning")
+        return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
 
 
 @app.route('/edit_keyword')
@@ -197,7 +201,10 @@ def remove_keyword(keyword):
 
     except ValueError:
         pass
-    return redirect('/')
+
+    if g.user:
+        return redirect('/')
+    return redirect('/demo')
 
 
 @app.route('/users/<int:user_id>/cards', methods=['POST'])
@@ -240,15 +247,17 @@ def show_card(user_id, card_id):
 
 @app.route('/users/<int:user_id>/cards/<int:card_id>/delete', methods=['POST'])
 def delete_card(user_id, card_id):
+
     if g.user.id == user_id:
         card = AnalysisCard.query.get(card_id)
-        g.user.analysis_card.remove(card)
-        db.session.commit()
-        return redirect('/')
+        if card in g.user.analysis_card:
+            g.user.analysis_card.remove(card)
+            db.session.commit()
+            return redirect(f"/users/{user_id}/dashboard")
 
     flash("Access not allowed", "danger")
 
-    return redirect('/')
+    return redirect("/")
 
 
 @app.route('/users/<int:user_id>/profile', methods=['GET', 'POST'])
@@ -278,3 +287,17 @@ def show_user_dashboard(user_id):
 
     flash("Access not allowed", "danger")
     return redirect('/')
+
+
+@app.route('/about')
+def about():
+
+    return render_template('about.html')
+
+
+@app.route('/demo')
+def demo():
+    add_keyword_form = KeywordForm()
+    form = AnalyzeForm()
+
+    return render_template('machine.html',  add_keyword_form=add_keyword_form, form=form)

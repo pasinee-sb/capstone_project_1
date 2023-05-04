@@ -32,10 +32,12 @@
             <li class="nav-item active">
               <a class="nav-link text-light" aria-current="page" href="/">Home</a>
             </li>
+           
             
             <li class="nav-item">
-              <a class="nav-link text-light" href="#">About</a>
+              <a class="nav-link text-light" href="/about">About</a>
             </li>
+          
           </ul>
             {% if not g.user %}
             <div class="d-flex align-items-center">  
@@ -43,7 +45,7 @@
               <a class="px-3 me-2 btn btn-primary" href="/signup" role="button">Sign up</a>
            
     
-              <a class="px-3 me-2 btn btn-primary" href="/login" role="button">Log in</a>
+              <a class="px-3 me-2 btn btn-success" href="/login" role="button">Log in</a>
             </div>
   
             {% else %}
@@ -52,16 +54,15 @@
             
               <a class="px-3 me-2 btn btn-success" href="/users/{{g.user.id}}/profile" role="button">{{g.user.username}}</a> 
 
-              {%if request.path == url_for('machine', user_id= g.user.id)%}
+        
               <a class="px-3 me-2 btn btn-primary" href="/users/{{g.user.id}}/dashboard" role="button">Dashboard</a> 
-
-           
-
-              {%else%}
-              <a class="px-3 me-2 btn btn-primary" href="/users/{{g.user.id}}" role="button">Go to Analyze Machine</a> 
+   
+    
+             
+              <a class="px-3 me-2 btn btn-primary" href="/users/{{g.user.id}}" role="button">Analyze Machine</a> 
              
 
-              {%endif%}
+        
           
               <a class="px-3 me-2 btn btn-danger" href="/logout" role="button">Log out </a>
               
@@ -84,7 +85,7 @@
 
 
   {% for category, message in get_flashed_messages(with_categories=True) %}
-  <div class="alert alert-{{ category }}">{{ message }}</div>
+  <div class="col-lg-6 w-50 mx-auto text-center alert alert-{{ category }}">{{ message }}</div>
   {% endfor %}
 
 
@@ -101,8 +102,8 @@
 <footer class="bg-light text-center text-lg-start mt-auto">
   <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
     <p>&copy;<span id="currentYear"></span> Copyright:
-  <a class="text-dark"href="https://www.linkedin.com/in/pasinee-sb/" target="_blank">
-    Pasinee S.
+  <a class="text-dark text-decoration-none"href="https://www.linkedin.com/in/pasinee-sb/" target="_blank">
+    <b>Pasinee S.</b> 
 </a>
 </p>
 </div>
