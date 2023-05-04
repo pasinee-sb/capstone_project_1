@@ -74,8 +74,6 @@ class Keyword(db.Model):
 
     keyword_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     word = db.Column(db.String, nullable=False)
-    # sentiment_scores = db.relationship(
-    #     'SentimentScore', backref='keyword', lazy=True)
 
 
 class AnalysisCard(db.Model):
@@ -99,7 +97,7 @@ class AnalysisCard(db.Model):
         'SentimentScore', backref='analysis_card', lazy=True)
     keywords = db.relationship('Keyword',
                                secondary='sentiment_scores',
-                               backref='card')
+                               backref='card', overlaps="analysis_cards,sentiment_scores")
 
 
 class SentimentScore(db.Model):
@@ -113,7 +111,7 @@ class SentimentScore(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     keyword_id = db.Column(db.Integer, db.ForeignKey(
         'keywords.keyword_id'), primary_key=True)
-    keywords = db.relationship('Keyword', backref='score')
+    keywords = db.relationship('Keyword', backref='score', viewonly=True)
     score = db.Column(db.Float)
     analysis_card_id = db.Column(
         db.Integer, db.ForeignKey('analysis_cards.id'), primary_key=True)

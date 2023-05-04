@@ -3,44 +3,44 @@
 {%block content%}
 
 <div class="container">
-<form method="POST"  class="col-lg-6 w-50 mx-auto" >
+  <form method="POST" class="col-lg-6 w-50 mx-auto">
 
     {{ form.hidden_tag() }}
-  
 
-    
+
+
     <div class="form-outline mb-4">
-      <label for="username">Username    </label>
-      {{form.username (class_="form-control")}} 
+      <label for="username">Username </label>
+      {{form.username (class_="form-control")}}
 
     </div>
 
     <div class="form-outline mb-4">
 
-     {{ form.password.label }}
+      {{ form.password.label }}
       {{form.password (class_="form-control")}}
 
-      </div>
-      <div class="form-outline mb-4">
+    </div>
+    <div class="form-outline mb-4">
       {{ form.email.label }}
       {{form.email (class_="form-control")}}
-      </div>
-      
-      {% for field in form
-        if field.widget.input_type != 'hidden' %}
-        
-  
-      {% for error in field.errors %}
-      <span class="form-text text-danger">{{ error }}</span>
-      {% endfor %}
-   
-    {% endfor %}
-  
-    <div class="text-center">
-    <button type="submit" class="btn btn-primary btn-block">Sign me up!</button>
     </div>
-    
-  
+
+    {% for field in form
+        if field.widget.input_type != 'hidden' %}
+
+
+    {% for error in field.errors %}
+    <span class="form-text text-danger">{{ error }}</span>
+    {% endfor %}
+
+    {% endfor %}
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary btn-block">Sign me up!</button>
+    </div>
+
+
   </form>
 </div>
 

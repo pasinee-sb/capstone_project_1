@@ -3,48 +3,44 @@
 {%block content%}
 
 <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-<h3>{{card.analysis_theme}}</h3>
-
-
-
-
+    <h3>{{card.analysis_theme}}</h3>
 </div>
 
 
 <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-<table class="col-lg-6 w-50 mx-auto mt-2 text-center">
-    <tr>
-        <th> Keyword</th>
-       
-     <th> Sentiment Score</th>
- 
-    </tr>
-    {%for result,word in zip( card.sentiment_scores,card.keywords) %}
-    <tbody>
-    <tr>
-        <td>{{word.word}}</td>
+    <table class="col-lg-6 w-50 mx-auto mt-2 text-center">
+        <tr>
+            <th> Keyword</th>
 
-       
-        <td>
-    {{result.score}}
-        </td>
+            <th> Sentiment Score</th>
+
+        </tr>
+        {%for result,word in zip( card.sentiment_scores,card.keywords) %}
+        <tbody>
+            <tr>
+                <td>{{word.word}}</td>
 
 
-    </tr>
-    {%endfor%}
-</tbody>
+                <td>
+                    {{result.score}}
+                </td>
+
+
+            </tr>
+            {%endfor%}
+        </tbody>
     </table>
 </div>
 <hr>
 <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
- 
+
     <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-      <p>The score represents the degree of positive or negative sentiment conveyed by the text</p> 
-      <p>  -1  : very negative sentiment</p>
-      <p> 0  : neutral sentiment,</p>
-      <p>+1  : very positive sentiment.</p>  
+        <p>The score represents the degree of positive or negative sentiment conveyed by the text</p>
+        <p> -1 : very negative sentiment</p>
+        <p> 0 : neutral sentiment,</p>
+        <p>+1 : very positive sentiment.</p>
     </div>
-   
+
     <form action="/users/{{user_id}}/cards/{{card.id}}/delete" method="post">
         <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash-can text-danger"></i></button>
     </form>
@@ -52,4 +48,3 @@
 
 
 {%endblock%}
-

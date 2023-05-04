@@ -3,34 +3,23 @@
 {%block content%}
 
 
-
-
-
-
-  
-
-
-
-
-
-
-
 <div class="container mt-5">
-    <h1>Dashboard</h1>
-    {%if cards%}
-    <div class="row ">
-        {%for card in cards%}
-      <div class="col-md-3 mt-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">{{card.analysis_theme}}</h5>
-           
-            <a href="/users/{{g.user.id}}/cards/{{card.id}}" class="btn btn-primary">Go to {{card.analysis_theme}}</a>
-            <form class="d-inline float-end" action="/users/{{g.user.id}}/cards/{{card.id}}/delete" method="post">
-                <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash-can text-danger"></i></button>
-            </form>
-          </div>
-        
+  <h1>Dashboard</h1>
+  {%if cards%}
+  <div class="row ">
+    {%for card in cards%}
+    <div class="col-md-3 mt-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{card.analysis_theme}}</h5>
+
+          <a href="/users/{{g.user.id}}/cards/{{card.id}}" class="btn btn-primary">Go to {{card.analysis_theme}}</a>
+          <form class="d-inline float-end" action="/users/{{g.user.id}}/cards/{{card.id}}/delete" method="post">
+            <button type="submit" class="btn btn-outline-danger"><i
+                class="fa-solid fa-trash-can text-danger"></i></button>
+          </form>
+        </div>
+
       </div>
     </div>
     {%endfor%}
@@ -38,7 +27,7 @@
 </div>
 
 
-  {%endif%}
+{%endif%}
 </div>
 
 {%endblock%}

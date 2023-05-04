@@ -174,16 +174,29 @@ def add_keyword():
 @app.route('/analyze')
 def analyze():
     selected_keywords = request.args.getlist('keywords[]')
+    err = "Score not calculated, please check spelling or change keyword "
 
     results = []
     for word in selected_keywords:
+
         score = generate_sentiment(word)
-        results.append(score)
+        if score:
+            results.append(score)
+        else:
+
+            results.append(
+                err)
     if g.user:
-        return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
+        if err in results:
+            flash(err, "danger")
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
+        else:
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
     else:
-        flash("Sign up or Log in to save result", "warning")
-        return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
+        if err in results:
+            flash(err, "danger")
+            flash("Sign up or Log in to save result", "warning")
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
 
 
 @app.route('/edit_keyword')
@@ -209,13 +222,20 @@ def remove_keyword(keyword):
 
 @app.route('/users/<int:user_id>/cards', methods=['POST'])
 def save_results(user_id):
+    err = "Result(s) not saved, please check spelling or change keyword "
     results = request.form.getlist('results[]')
     keywords = request.form.getlist('words[]')
     theme = request.form.get('theme')
 
+    for res in results:
+        if isinstance(res, str):
+            flash(err, "danger")
+            return redirect("/")
+
     card = AnalysisCard(analysis_theme=theme, user_id=user_id)
     db.session.add(card)
     db.session.commit()
+
     for word, res in zip(keywords, results):
         keyword = Keyword(word=word)
         db.session.add(keyword)
@@ -224,7 +244,7 @@ def save_results(user_id):
             keyword_id=keyword.keyword_id, score=float(res), analysis_card_id=card.id)
         db.session.add(result)
         db.session.commit()
-    return redirect(f"/users/{user_id}/cards/{card.id}")
+        return redirect(f"/users/{user_id}/cards/{card.id}")
 
 
 @app.route('/users/<int:user_id>/cards/<int:card_id>')

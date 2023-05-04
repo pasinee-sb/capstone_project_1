@@ -2,7 +2,7 @@ import requests
 import requests.auth
 from credential import CLIENT_ID, CLIENT_SECRET
 from typing import List
-from statistics import mean
+from statistics import mean, StatisticsError
 from textblob import TextBlob
 
 
@@ -55,8 +55,7 @@ def get_query(keyword: str) -> List[str]:
     posts = []
     for item in data["data"]["children"]:
         post = {
-            "title": item["data"]["title"],
-            "permalink": item["data"]["permalink"]
+            "title": item["data"]["selftext"]
         }
         posts.append(post['title'])
 
@@ -76,8 +75,11 @@ def get_sentiment(all_posts: List[str]) -> List[float]:
 # # def generate_average_sentiment_score(keyword: str) -> int:
 def get_mean_score(scores):
 
-    average_score = mean(scores)
-    return round(average_score, 2)
+    try:
+        average_score = mean(scores)
+        return round(average_score, 2)
+    except StatisticsError:
+        return None
 
 
 def generate_sentiment(name):

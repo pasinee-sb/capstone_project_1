@@ -2,73 +2,73 @@
 
 {%block content%}
 
-<div class="col-lg-6 w-50 mx-auto text-center" >
-<h1>Result</h1>
+<div class="col-lg-6 w-50 mx-auto text-center">
+  <h1>Result</h1>
   <form method="post" action="/users/{{g.user.id}}/cards" class="col-lg-6 w-50 mx-auto text-center">
     <table class="col-lg-6 w-50 mx-auto text-center">
+      <tr>
+        <th> Keyword</th>
+
+        <th> Sentiment Score</th>
+
+      </tr>
+      {%for result,word in zip(results, selected_keywords) %}
+      <tbody>
         <tr>
-            <th> Keyword</th>
-           
-         <th> Sentiment Score</th>
-     
-        </tr>
-        {%for result,word in zip(results, selected_keywords) %}
-        <tbody>
-        <tr>
-            <td>{{word}}</td>
-     <input type="hidden" name="words[]" value="{{word}}">
-           
-            <td>
-        {{result}}
-            </td>
-            <input type="hidden" name="results[]" value="{{result}}">
-    
+          <td>{{word}}</td>
+          <input type="hidden" name="words[]" value="{{word}}">
+
+          <td>
+            {{result}}
+          </td>
+          <input type="hidden" name="results[]" value="{{result}}">
+
         </tr>
         {%endfor%}
-    </tbody>
-        </table>
-    </div>
-
-
-    
-
-    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-        <p>The score represents the degree of positive or negative sentiment conveyed by the text</p> 
-        <p>  -1  : very negative sentiment</p>
-        <p> 0  : neutral sentiment,</p>
-        <p>+1  : very positive sentiment.</p>  
-      </div>
-   
-
-    {%if not g.user%}
-
-    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">  
-         
-        <a class="px-3 me-2 btn btn-primary" href="/signup" role="button">Sign up</a>
-     
-
-        <a class="px-3 me-2 btn btn-success" href="/login" role="button">Log in</a>
-      </div>
-
-    {%else%}
-
-    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-        <input type="text" name="theme" id="" placeholder="Name result theme" required>
-        <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-            <button type="submit" class="btn btn-success">Save this result</button>
-                </div>
-   
-
-    {%endif%}
+      </tbody>
+    </table>
 </div>
 
 
 
-   
 
-  </form>
+<div class="col-md-3 w-30 mx-auto mt-5 text-center">
+  <p class="mt-0">The score represents the degree of positive or negative sentiment conveyed by the text</p>
+  <p class="mt-0"> -1 : very negative sentiment</p>
+  <p class="mt-0"> 0 : neutral sentiment</p>
+  <p class="mt-0">+1 : very positive sentiment</p>
+</div>
 
- 
+
+{%if not g.user%}
+
+<div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+
+  <a class="px-3 me-2 btn btn-primary" href="/signup" role="button">Sign up</a>
+
+
+  <a class="px-3 me-2 btn btn-success" href="/login" role="button">Log in</a>
+</div>
+
+{%else%}
+
+<div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+  <input type="text" name="theme" id="" placeholder="Name result theme" required>
+  <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+    <button type="submit" class="btn btn-success">Save this result</button>
+  </div>
+
+
+  {%endif%}
+</div>
+
+
+
+
+
+</form>
+
+
 
 
 {%endblock%}
