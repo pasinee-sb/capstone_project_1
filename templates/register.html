@@ -8,14 +8,15 @@
     {{ form.hidden_tag() }}
   
 
-    <p>
+    
        
-      {{ form.username.label }}
-      {{form.username (class_="form-control")}} </p>
-     <p> {{ form.password.label }}
-      {{form.password (class_="form-control")}}</p>
-      <p>{{ form.email.label }}
-      {{form.email (class_="form-control")}}</p>
+      <label for="username">Username    </label>
+      {{form.username (class_="form-control")}} 
+
+     {{ form.password.label }}
+      {{form.password (class_="form-control")}}
+      {{ form.email.label }}
+      {{form.email (class_="form-control")}}
       
       {% for field in form
         if field.widget.input_type != 'hidden' %}
@@ -27,7 +28,8 @@
    
     {% endfor %}
   
-    <input  type="submit" class="btn btn-primary" >
+   
+    <button type="submit" class="btn btn-primary">Sign me up!</button>
   
   </form>
 </div>

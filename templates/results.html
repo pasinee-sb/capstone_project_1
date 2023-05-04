@@ -1,22 +1,37 @@
 {%extends 'base.html'%}
 
 {%block content%}
-<table>
 
-<tr>
-    {%for result in results%}
+
+<h1>Result</h1>
+  <form method="post" action="/users/{{g.user.id}}/cards">
+    <table>
+        <tr>
+            <th> Keyword</th>
+           
+         <th> Sentiment Score</th>
+     
+        </tr>
+        {%for result,word in zip(results, selected_keywords) %}
+        <tbody>
+        <tr>
+            <td>{{word}}</td>
+     <input type="hidden" name="words[]" value="{{word}}">
+           
+            <td>
+        {{result}}
+            </td>
+            <input type="hidden" name="results[]" value="{{result}}">
     
-    <td>{{result}}</td>
-    {%endfor%}
-</tr>
-   <tr>
-    {%for word in selected_keywords%}
-    <td>
-{{word}}
-    </td>
-    {%endfor%}
-</tr>
-</table>
+        </tr>
+        {%endfor%}
+    </tbody>
+        </table>
+        <input type="text" name="theme" id="" placeholder="Name result theme" required>
+    <button type="submit">Save this result</button>
+  </form>
+
+  <a href="/"><button >Home</button></a>
 
 
 {%endblock%}

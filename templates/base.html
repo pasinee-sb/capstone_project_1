@@ -8,13 +8,13 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
   integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- <link rel="stylesheet" href="/static/app.css"> -->
+  <link rel="stylesheet" href="static/app.css">
 </head>
 <body>
 <header>
-  <h1> KEYWORD SENTIMENT ANALYSIS MACHINE</h1>
+  <h1> SENTIMENT ANALYSIS MACHINE</h1>
 
-  <h2>Sentiment analysis from keyword search in reddit.com </h2>
+  <h3>Analyze sentiment from keyword search on reddit.com </h3>
 </header>
 <nav>
 <div>
@@ -23,7 +23,7 @@
       <li><a href="/signup">Sign up</a></li>
       <li><a href="/login">Log in</a></li>
       {% else %}
-      <li> <a href="/users/{{g.user.id}}">{{g.user.username}}</a> </li>
+      <li> <a href="/users/{{g.user.id}}/profile">{{g.user.username}}</a> </li>
      
      
       <li><a href="/logout">Log out</a></li>

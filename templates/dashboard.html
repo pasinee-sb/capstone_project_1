@@ -2,13 +2,16 @@
 
 {%block content%}
 
-<p> user_id : {{g.user.id}} username : {{g.user.username}}</p>
+
+{%if cards%}
+<p><b> Saved Sentiment Analysis</b></p>
 <ul>
-   <p><b> Saved Sentiment Analysis</b></p>
+  
 {%for card in cards%}
- <li><a href="/users/{{g.user.id}}/{{card.id}}">{{card.analysis_theme}}</a></li>
+ <li><a href="/users/{{g.user.id}}/cards/{{card.id}}">{{card.analysis_theme}}</a></li>
 {%endfor%}
 </ul>
+{%endif%}
 
 
 

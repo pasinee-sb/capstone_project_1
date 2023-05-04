@@ -1,0 +1,41 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<p>Card_id :  {{card.id}}</p>
+<p>Card_user_id : {{card.user_id}}</p>
+<p>Analysis Theme: {{card.analysis_theme}}</p>
+
+<p>user_id :{{user_id}}</p>
+
+
+
+<table>
+    <tr>
+        <th> Keyword</th>
+       
+     <th> Sentiment Score</th>
+ 
+    </tr>
+    {%for result,word in zip( card.sentiment_scores,card.keywords) %}
+    <tbody>
+    <tr>
+        <td>{{word.word}}</td>
+
+       
+        <td>
+    {{result.score}}
+        </td>
+
+
+    </tr>
+    {%endfor%}
+</tbody>
+    </table>
+    <form action="/users/{{user_id}}/cards/{{card.id}}/delete" method="post">
+        <button type="submit">Delete</button>
+    </form>
+
+
+
+{%endblock%}
+

@@ -45,7 +45,7 @@ def get_query(keyword: str) -> List[str]:
     params = {"q": keyword, "t": "year", "limit": 100}
 
     response2 = requests.get(
-        "https://oauth.reddit.com/r/Thailand/search.json", headers=headers2, params=params)
+        "https://oauth.reddit.com/search.json", headers=headers2, params=params)
 
     data = response2.json()
     posts = data['data']['children']

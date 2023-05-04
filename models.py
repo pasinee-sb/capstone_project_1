@@ -30,8 +30,8 @@ class User(db.Model):
 
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.Text, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    username = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False,)
     auth_id = db.Column(db.Integer, db.ForeignKey('auths.id'))
 
     auth = db.relationship('Auth', backref='user')
@@ -70,12 +70,12 @@ class Keyword(db.Model):
 
     def __repr__(self):
         k = self
-        return f"<KeyWord id ={k.keyword_id} word = {k.word}> sentiment_score={k.sentiment_score}"
+        return f"<KeyWord id ={k.keyword_id} word = {k.word}> "
 
     keyword_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     word = db.Column(db.String, nullable=False)
-    sentiment_scores = db.relationship(
-        'SentimentScore', backref='keyword', lazy=True)
+    # sentiment_scores = db.relationship(
+    #     'SentimentScore', backref='keyword', lazy=True)
 
 
 class AnalysisCard(db.Model):
@@ -89,11 +89,17 @@ class AnalysisCard(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     analysis_theme = db.Column(db.String)
+    # Add a unique constraint to user_id and analysis_theme
+    __table_args__ = (db.UniqueConstraint(
+        'user_id', 'analysis_theme', name='_user_analysis_uc'),)
 
     user_id = db.Column(db.Integer, db.ForeignKey(
         'users.id', ondelete='CASCADE'))
     sentiment_scores = db.relationship(
         'SentimentScore', backref='analysis_card', lazy=True)
+    keywords = db.relationship('Keyword',
+                               secondary='sentiment_scores',
+                               backref='card')
 
 
 class SentimentScore(db.Model):
@@ -104,12 +110,13 @@ class SentimentScore(db.Model):
         s = self
         return f"<SentimentScore id={s.id} keyword_id={s.keyword_id} score={s.score} analysis_card_id={s.analysis_card_id}>"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     keyword_id = db.Column(db.Integer, db.ForeignKey(
-        'keywords.keyword_id'))
-    score = db.Column(db.Integer)
+        'keywords.keyword_id'), primary_key=True)
+    keywords = db.relationship('Keyword', backref='score')
+    score = db.Column(db.Float)
     analysis_card_id = db.Column(
-        db.Integer, db.ForeignKey('analysis_cards.id'),)
+        db.Integer, db.ForeignKey('analysis_cards.id'), primary_key=True)
     created_date = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     __table_args__ = (

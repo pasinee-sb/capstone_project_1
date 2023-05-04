@@ -3,7 +3,7 @@ from typing import List
 from flask import Flask, request, jsonify, render_template, redirect, session, g, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, AnalysisCard, db, connect_db, Keyword, SentimentScore, Auth
-from forms import KeywordForm, UserForm, LoginForm, AnalyzeForm, EditKeywordForm, RemoveKeywordForm
+from forms import KeywordForm, UserForm, LoginForm, AnalyzeForm, EditKeywordForm, RemoveKeywordForm, UserEditForm
 import os
 
 CURR_USER_KEY = "curr_user"
@@ -118,13 +118,16 @@ def signup():
 
 @app.route('/users/<int:user_id>')
 def dashboard(user_id):
-    cards = AnalysisCard.query.filter_by(user_id=user_id).all()
-    print("############### ME CARD")
-    print(cards)
-    add_keyword_form = KeywordForm()
-    form = AnalyzeForm()
+    if g.user.id == user_id:
+        cards = AnalysisCard.query.filter_by(user_id=user_id).all()
 
-    return render_template('dashboard.html', cards=cards, add_keyword_form=add_keyword_form, form=form)
+        add_keyword_form = KeywordForm()
+        form = AnalyzeForm()
+
+        return render_template('dashboard.html', cards=cards, add_keyword_form=add_keyword_form, form=form)
+
+    flash("Access not allowed", "danger")
+    return redirect('/')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -149,7 +152,9 @@ def log_in():
 
 @app.route('/logout')
 def log_out():
+    session.clear()
     do_logout()
+
     flash("See you later!", "success")
     return redirect('/login')
 
@@ -176,7 +181,7 @@ def analyze():
         score = generate_sentiment(word)
         results.append(score)
     # do something with selected_keywords...
-    return render_template('results.html', results=results, selected_keywords=selected_keywords)
+    return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
 
 
 @app.route('/edit_keyword')
@@ -194,4 +199,66 @@ def remove_keyword(keyword):
 
     except ValueError:
         pass
+    return redirect('/')
+
+
+@app.route('/users/<int:user_id>/cards', methods=['POST'])
+def save_results(user_id):
+    results = request.form.getlist('results[]')
+    keywords = request.form.getlist('words[]')
+    theme = request.form.get('theme')
+
+    card = AnalysisCard(analysis_theme=theme, user_id=user_id)
+    db.session.add(card)
+    db.session.commit()
+    for word, res in zip(keywords, results):
+        keyword = Keyword(word=word)
+        db.session.add(keyword)
+        db.session.commit()
+        result = SentimentScore(
+            keyword_id=keyword.keyword_id, score=float(res), analysis_card_id=card.id)
+        db.session.add(result)
+        db.session.commit()
+    return redirect(f"/users/{user_id}/cards/{card.id}")
+
+
+@app.route('/users/<int:user_id>/cards/<int:card_id>')
+def show_card(user_id, card_id):
+    if g.user.id == user_id:
+        card = AnalysisCard.query.get(card_id)
+
+        return render_template('card.html', card=card, user_id=user_id, zip=zip)
+    flash("Access not aloowed!", "danger")
+
+    return redirect('/')
+
+
+@app.route('/users/<int:user_id>/cards/<int:card_id>/delete', methods=['POST'])
+def delete_card(user_id, card_id):
+    if g.user.id == user_id:
+        card = AnalysisCard.query.get(card_id)
+        g.user.analysis_card.remove(card)
+        db.session.commit()
+        return redirect('/')
+
+    flash("Access not allowed", "danger")
+
+    return redirect('/')
+
+
+@app.route('/users/<int:user_id>/profile', methods=['GET', 'POST'])
+def user_profile(user_id):
+    if g.user.id == user_id:
+        form = UserEditForm(obj=g.user)
+
+        if form.validate_on_submit():
+            g.user.username = form.username.data
+            g.user.email = form.email.data
+            db.session.commit()
+            flash("User edited", "success")
+            return redirect('/')
+
+        return render_template('edit_user.html', form=form)
+
+    flash("Access not allowed", "danger")
     return redirect('/')
