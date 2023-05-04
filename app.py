@@ -68,6 +68,7 @@ def do_logout():
     if CURR_USER_KEY in session:
 
         del session[CURR_USER_KEY]
+        del session['keywords']
 
 
 @app.route('/')
@@ -152,7 +153,7 @@ def log_in():
 
 @app.route('/logout')
 def log_out():
-    session.clear()
+
     do_logout()
 
     flash("See you later!", "success")
@@ -225,10 +226,17 @@ def save_results(user_id):
 @app.route('/users/<int:user_id>/cards/<int:card_id>')
 def show_card(user_id, card_id):
     if g.user.id == user_id:
+
         card = AnalysisCard.query.get(card_id)
 
-        return render_template('card.html', card=card, user_id=user_id, zip=zip)
-    flash("Access not aloowed!", "danger")
+        if card in g.user.analysis_card:
+
+            return render_template('card.html', card=card, user_id=user_id, zip=zip)
+
+        else:
+            flash("This card does not belong to you", "danger")
+    else:
+        flash("Access not allowed", "danger")
 
     return redirect('/')
 

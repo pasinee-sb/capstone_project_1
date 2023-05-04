@@ -27,7 +27,7 @@
   
 
 
-
+{%if 'keywords' in session%}
   <h1>CHECK KEYWORDS TO ANALYZE</h1>
   <form method="post" action="{{ url_for('analyze') }}">
     <ul>
@@ -43,4 +43,6 @@
     </ul>
     <button type="submit">Analyze</button>
   </form>
+
+  {%endif%}
 {%endblock%}
