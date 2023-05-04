@@ -1,12 +1,16 @@
-from polling import generate_sentiment
+from polling import generate_sentiment, plot_graph
 from typing import List
 from flask import Flask, request, jsonify, render_template, redirect, session, g, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, AnalysisCard, db, connect_db, Keyword, SentimentScore, Auth
-from forms import KeywordForm, UserForm, LoginForm, AnalyzeForm, EditKeywordForm, RemoveKeywordForm, UserEditForm
+from forms import KeywordForm, UserForm, LoginForm, AnalyzeForm, UserEditForm
+from sqlalchemy.exc import IntegrityError
 import os
 
+
 CURR_USER_KEY = "curr_user"
+image_string = ""
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
@@ -175,8 +179,8 @@ def add_keyword():
 def analyze():
     selected_keywords = request.args.getlist('keywords[]')
     err = "Score not calculated, please check spelling or change keyword "
-
     results = []
+
     for word in selected_keywords:
 
         score = generate_sentiment(word)
@@ -191,18 +195,21 @@ def analyze():
             flash(err, "danger")
             return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
         else:
-            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
+
+            image_string = plot_graph(selected_keywords, results)
+
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
     else:
         if err in results:
             flash(err, "danger")
             flash("Sign up or Log in to save result", "warning")
             return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
 
+        else:
+            image_string = plot_graph(selected_keywords, results)
 
-@app.route('/edit_keyword')
-def edit_keyword():
-    form = EditKeywordForm()
-    return None
+            flash("Sign up or Log in to save result", "warning")
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
 
 
 @app.route('/remove_keyword/<keyword>')
@@ -226,15 +233,27 @@ def save_results(user_id):
     results = request.form.getlist('results[]')
     keywords = request.form.getlist('words[]')
     theme = request.form.get('theme')
+    image_string = request.form.get('image_string')
 
     for res in results:
-        if isinstance(res, str):
+        if not res.lstrip("-").replace(".", "").isnumeric():
             flash(err, "danger")
             return redirect("/")
 
-    card = AnalysisCard(analysis_theme=theme, user_id=user_id)
-    db.session.add(card)
-    db.session.commit()
+    existing_card = AnalysisCard.query.filter_by(
+        analysis_theme=theme, user_id=user_id).first()
+
+    if existing_card:
+        flash("Analysis theme is taken, please change the theme", "danger")
+
+        return render_template('results.html', results=results, selected_keywords=keywords, zip=zip, image_string=image_string)
+
+    else:
+        card = AnalysisCard(analysis_theme=theme,
+                            user_id=user_id, image_string=image_string)
+
+        db.session.add(card)
+        db.session.commit()
 
     for word, res in zip(keywords, results):
         keyword = Keyword(word=word)
@@ -244,7 +263,8 @@ def save_results(user_id):
             keyword_id=keyword.keyword_id, score=float(res), analysis_card_id=card.id)
         db.session.add(result)
         db.session.commit()
-        return redirect(f"/users/{user_id}/cards/{card.id}")
+
+    return redirect(f"/users/{user_id}/cards/{card.id}")
 
 
 @app.route('/users/<int:user_id>/cards/<int:card_id>')
@@ -254,6 +274,12 @@ def show_card(user_id, card_id):
         card = AnalysisCard.query.get(card_id)
 
         if card in g.user.analysis_card:
+            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
+            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
+            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
+            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
+            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
+            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
 
             return render_template('card.html', card=card, user_id=user_id, zip=zip)
 
@@ -265,13 +291,14 @@ def show_card(user_id, card_id):
     return redirect('/')
 
 
-@app.route('/users/<int:user_id>/cards/<int:card_id>/delete', methods=['POST'])
+@ app.route('/users/<int:user_id>/cards/<int:card_id>/delete', methods=['POST'])
 def delete_card(user_id, card_id):
 
     if g.user.id == user_id:
         card = AnalysisCard.query.get(card_id)
         if card in g.user.analysis_card:
             g.user.analysis_card.remove(card)
+            db.session.delete(card)
             db.session.commit()
             return redirect(f"/users/{user_id}/dashboard")
 
@@ -280,7 +307,7 @@ def delete_card(user_id, card_id):
     return redirect("/")
 
 
-@app.route('/users/<int:user_id>/profile', methods=['GET', 'POST'])
+@ app.route('/users/<int:user_id>/profile', methods=['GET', 'POST'])
 def user_profile(user_id):
     if g.user.id == user_id:
         form = UserEditForm(obj=g.user)
@@ -298,7 +325,7 @@ def user_profile(user_id):
     return redirect('/')
 
 
-@app.route('/users/<int:user_id>/dashboard')
+@ app.route('/users/<int:user_id>/dashboard')
 def show_user_dashboard(user_id):
     if g.user.id == user_id:
         cards = AnalysisCard.query.filter_by(user_id=user_id).all()
@@ -309,15 +336,32 @@ def show_user_dashboard(user_id):
     return redirect('/')
 
 
-@app.route('/about')
+@ app.route('/about')
 def about():
 
     return render_template('about.html')
 
 
-@app.route('/demo')
+@ app.route('/demo')
 def demo():
     add_keyword_form = KeywordForm()
     form = AnalyzeForm()
 
     return render_template('machine.html',  add_keyword_form=add_keyword_form, form=form)
+
+
+##############################################################################
+# Turn off all caching in Flask
+#   (useful for dev; in production, this kind of stuff is typically
+#   handled elsewhere)
+#
+# https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+@ app.after_request
+def add_header(req):
+    """Add non-caching headers on every request."""
+
+    req.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    req.headers["Pragma"] = "no-cache"
+    req.headers["Expires"] = "0"
+    req.headers['Cache-Control'] = 'public, max-age=0'
+    return req

@@ -1,10 +1,21 @@
 {%extends 'base.html'%}
 
 {%block content%}
-
-<div class="col-lg-6 w-50 mx-auto text-center">
+<div class="container mt-5">
   <h1>Result</h1>
+</div>
+<hr>
+
+<div class="col-md-4 w-50 mx-auto mb-10 text-center">
+  <img src="data:image/png;base64,{{ image_string }}" style="width: auto; height: 100%;">
+</div>
+
+<div class="col-lg-6 w-50 mx-auto mt-5 text-center">
+
   <form method="post" action="/users/{{g.user.id}}/cards" class="col-lg-6 w-50 mx-auto text-center">
+    <!-- Add this line to include the hidden input field -->
+    <input type="hidden" name="image_string" value="{{ image_string }}">
+
     <table class="col-lg-6 w-50 mx-auto text-center">
       <tr>
         <th> Keyword</th>

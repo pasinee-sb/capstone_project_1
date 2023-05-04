@@ -52,12 +52,3 @@ class AnalyzeForm(FlaskForm):
     keywords = FieldList(StringField('Keyword', validators=[
                          DataRequired()]), min_entries=1)
     submit = SubmitField('Analyze')
-
-
-class EditKeywordForm(FlaskForm):
-    keyword = StringField('Keyword', validators=[DataRequired()])
-    submit = SubmitField('Save')
-
-
-class RemoveKeywordForm(FlaskForm):
-    submit = SubmitField('Remove')

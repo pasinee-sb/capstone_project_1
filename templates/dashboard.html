@@ -5,6 +5,7 @@
 
 <div class="container mt-5">
   <h1>Dashboard</h1>
+  <hr>
   {%if cards%}
   <div class="row ">
     {%for card in cards%}
@@ -15,8 +16,7 @@
 
           <a href="/users/{{g.user.id}}/cards/{{card.id}}" class="btn btn-primary">Go to {{card.analysis_theme}}</a>
           <form class="d-inline float-end" action="/users/{{g.user.id}}/cards/{{card.id}}/delete" method="post">
-            <button type="submit" class="btn btn-outline-danger"><i
-                class="fa-solid fa-trash-can text-danger"></i></button>
+            <button type="submit" class="btn "><i class="fa-solid fa-trash-can text-danger"></i></button>
           </form>
         </div>
 

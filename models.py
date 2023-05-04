@@ -87,6 +87,7 @@ class AnalysisCard(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     analysis_theme = db.Column(db.String)
+    image_string = db.Column(db.String)
     # Add a unique constraint to user_id and analysis_theme
     __table_args__ = (db.UniqueConstraint(
         'user_id', 'analysis_theme', name='_user_analysis_uc'),)
@@ -94,7 +95,7 @@ class AnalysisCard(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(
         'users.id', ondelete='CASCADE'))
     sentiment_scores = db.relationship(
-        'SentimentScore', backref='analysis_card', lazy=True)
+        'SentimentScore', backref='analysis_card', cascade="all, delete", lazy=True)
     keywords = db.relationship('Keyword',
                                secondary='sentiment_scores',
                                backref='card', overlaps="analysis_cards,sentiment_scores")

@@ -4,6 +4,10 @@ from credential import CLIENT_ID, CLIENT_SECRET
 from typing import List
 from statistics import mean, StatisticsError
 from textblob import TextBlob
+import numpy as np
+import matplotlib.pyplot as plt
+import io
+import base64
 
 
 def authenticate_reddit():
@@ -55,9 +59,11 @@ def get_query(keyword: str) -> List[str]:
     posts = []
     for item in data["data"]["children"]:
         post = {
-            "title": item["data"]["selftext"]
+            "title": item["data"]["title"],
+            "selftext": item["data"]["selftext"]
         }
         posts.append(post['title'])
+        posts.append(post['selftext'])
 
     return (posts)
 
@@ -87,3 +93,15 @@ def generate_sentiment(name):
     sentiment_scores = get_sentiment(all_posts)
     mean_score = get_mean_score(sentiment_scores)
     return (mean_score)
+
+
+def plot_graph(x, y):
+    fig, ax = plt.subplots()
+    ax.bar(x, y, width=0.3)
+    plt.xticks(rotation=45)
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight')
+    buffer.seek(0)
+    image_string = base64.b64encode(buffer.getvalue()).decode()
+    return image_string
