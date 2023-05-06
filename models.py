@@ -32,9 +32,10 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False,)
-    auth_id = db.Column(db.Integer, db.ForeignKey('auths.id'))
+    auth_id = db.Column(db.Integer, db.ForeignKey(
+        'auths.id', ondelete='CASCADE'))
 
-    auth = db.relationship('Auth', backref='user')
+    auth = db.relationship('Auth', backref='user', cascade='all, delete')
     analysis_card = db.relationship(
         'AnalysisCard', backref='user', cascade='all,delete')
 
@@ -87,18 +88,17 @@ class AnalysisCard(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     analysis_theme = db.Column(db.String)
-    image_string = db.Column(db.String)
-    # Add a unique constraint to user_id and analysis_theme
-    __table_args__ = (db.UniqueConstraint(
-        'user_id', 'analysis_theme', name='_user_analysis_uc'),)
 
     user_id = db.Column(db.Integer, db.ForeignKey(
         'users.id', ondelete='CASCADE'))
-    sentiment_scores = db.relationship(
-        'SentimentScore', backref='analysis_card', cascade="all, delete", lazy=True)
-    keywords = db.relationship('Keyword',
-                               secondary='sentiment_scores',
-                               backref='card', overlaps="analysis_cards,sentiment_scores")
+    created_date = db.Column(db.DateTime, default=db.func.current_timestamp())
+    image_string = db.Column(db.String)
+    sentiment_score = db.relationship(
+        'SentimentScore', backref='card', cascade='all, delete', overlaps="card,sentiment_score")
+
+    # Add a unique constraint to user_id and analysis_theme
+    __table_args__ = (db.UniqueConstraint(
+        'user_id', 'analysis_theme', created_date, name='_user_analysis_uc'),)
 
 
 class SentimentScore(db.Model):
@@ -111,11 +111,15 @@ class SentimentScore(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     keyword_id = db.Column(db.Integer, db.ForeignKey(
-        'keywords.keyword_id'), primary_key=True)
-    keywords = db.relationship('Keyword', backref='score', viewonly=True)
+        'keywords.keyword_id', ondelete='CASCADE'), primary_key=True)
+    keywords = db.relationship(
+        'Keyword', backref='score', cascade='all, delete')
     score = db.Column(db.Float)
     analysis_card_id = db.Column(
-        db.Integer, db.ForeignKey('analysis_cards.id'), primary_key=True)
+        db.Integer, db.ForeignKey('analysis_cards.id', ondelete='CASCADE'), primary_key=True)
+    analysis_card = db.relationship(
+        'AnalysisCard', backref='sentiment_scores', passive_deletes=True, overlaps="card,sentiment_score")
+
     created_date = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     __table_args__ = (
