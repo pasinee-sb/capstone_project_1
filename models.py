@@ -116,9 +116,9 @@ class SentimentScore(db.Model):
         'Keyword', backref='score', cascade='all, delete')
     score = db.Column(db.Float)
     analysis_card_id = db.Column(
-        db.Integer, db.ForeignKey('analysis_cards.id', ondelete='CASCADE'), primary_key=True)
+        db.Integer, db.ForeignKey('analysis_cards.id', ondelete='CASCADE'))
     analysis_card = db.relationship(
-        'AnalysisCard', backref='sentiment_scores', passive_deletes=True, overlaps="card,sentiment_score")
+        'AnalysisCard', backref='sentiment_scores', cascade='all, delete', overlaps="card,sentiment_score")
 
     created_date = db.Column(db.DateTime, default=db.func.current_timestamp())
 

@@ -1,6 +1,6 @@
 from polling import generate_sentiment, plot_graph
 from typing import List
-from flask import Flask, request, jsonify, render_template, redirect, session, g, flash
+from flask import Flask, request, render_template, redirect, session, g, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, AnalysisCard, db, connect_db, Keyword, SentimentScore, Auth
 from forms import KeywordForm, UserForm, LoginForm, AnalyzeForm, UserEditForm
@@ -13,12 +13,22 @@ image_string = ""
 
 
 app = Flask(__name__)
-app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
-app.app_context().push()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///reddi-senti'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+with app.app_context():
+
+    uri = os.environ.get('DATABASE_URL', 'postgresql:///reddi-senti')
+
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SQLALCHEMY_ECHO"] = True
+    app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', 'mycapstone1')
+    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+    app.config.update(SESSION_COOKIE_SAMESITE="None",
+                      SESSION_COOKIE_SECURE=True)
+    app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
 
 
 # connect to database
@@ -274,12 +284,6 @@ def show_card(user_id, card_id):
         card = AnalysisCard.query.get(card_id)
 
         if card in g.user.analysis_card:
-            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
-            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
-            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
-            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
-            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
-            print("SHOW  CARD IMAGE  pppppppppppppppppppppppppppppppppppppp")
 
             return render_template('card.html', card=card, user_id=user_id, zip=zip)
 
