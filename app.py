@@ -9,26 +9,35 @@ import os
 
 
 CURR_USER_KEY = "curr_user"
-image_string = ""
 
 
 app = Flask(__name__)
+app.app_context().push()
+uri = os.environ.get('DATABASE_URL', 'postgresql:///reddi-senti')
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ECHO"] = True
+app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', 'mycapstone1')
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+app.config.update(SESSION_COOKIE_SAMESITE="None",
+                  SESSION_COOKIE_SECURE=True)
+app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
 
-with app.app_context():
+# with app.app_context():
 
-    uri = os.environ.get('DATABASE_URL', 'postgresql:///reddi-senti')
+#     uri = os.environ.get('DATABASE_URL', 'postgresql:///reddi-senti')
 
-    if uri.startswith("postgres://"):
-        uri = uri.replace("postgres://", "postgresql://", 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+#     if uri.startswith("postgres://"):
+#         uri = uri.replace("postgres://", "postgresql://", 1)
+#     app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SQLALCHEMY_ECHO"] = True
-    app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', 'mycapstone1')
-    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-    app.config.update(SESSION_COOKIE_SAMESITE="None",
-                      SESSION_COOKIE_SECURE=True)
-    app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
+#     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+#     app.config["SQLALCHEMY_ECHO"] = True
+#     app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', 'mycapstone1')
+#     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+#     app.config.update(SESSION_COOKIE_SAMESITE="None",
+#                       SESSION_COOKIE_SECURE=True)
+#     app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
 
 
 # connect to database
