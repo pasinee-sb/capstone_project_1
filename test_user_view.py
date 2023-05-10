@@ -36,7 +36,7 @@ db.create_all()
 app.config['WTF_CSRF_ENABLED'] = False
 
 
-class MessageViewTestCase(TestCase):
+class UserViewTestCase(TestCase):
     """Test views for messages."""
 
     def setUp(self):

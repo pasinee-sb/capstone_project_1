@@ -112,3 +112,11 @@ class UserModelTestCase(TestCase):
         auth1 = Auth.query.filter_by(id=u.auth_id).first()
 
         self.assertEqual(auth1.id, u.auth_id)
+
+        # Does deleting a user delete their auth_id from the auths table?
+
+        db.session.delete(u)
+        db.session.commit()
+
+        auth2 = Auth.query.filter_by(id=u.auth_id).first()
+        self.assertIsNone(auth2)
