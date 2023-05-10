@@ -50,8 +50,8 @@ for reddit search and retrieve posts and comments related to the search term.
 ### Install the required Python packages using  
     
     pip3 install -r requirements.txt
-### Create a PostgreSQL database for the project.  
-   createdb reddi-senti
+### Create a PostgreSQL database for the project.
+    createdb reddi-senti
 ### Run the application
     flask run
 
