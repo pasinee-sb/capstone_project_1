@@ -1,9 +1,9 @@
 Note: This project uses an API key that is not included in the repository. If you want to use this project, please visit the website at [Reddi-Senti](https://reddi-senti.onrender.com/) instead of cloning the repository.
 
 # Reddi-Senti    *Analyze sentiment on Reddit*
-    "Reddi-Senti" is a Flask web application that allows users to analyze the sentiment of keywords searched on Reddit, the popular social news aggregation and discussion website. With "Reddi-Senti," users can compare the sentiment of multiple keywords and view visualized graphs comparing the results of sentiment analysis for each keyword.
+"Reddi-Senti" is a Flask web application that allows users to analyze the sentiment of keywords searched on Reddit, the popular social news aggregation and discussion website. With "Reddi-Senti," users can compare the sentiment of multiple keywords and view visualized graphs comparing the results of sentiment analysis for each keyword.
     
-    ![result_graph](result_graph.png)
+![result_graph](result_graph.png)
 
 ## Prerequisites
 - Python 3.6 or later
