@@ -12,6 +12,8 @@ CURR_USER_KEY = "curr_user"
 
 
 app = Flask(__name__)
+
+"""uncomment below when in development environment"""
 # app.app_context().push()
 # uri = os.environ.get('DATABASE_URL', 'postgresql:///reddi-senti')
 # app.config['SQLALCHEMY_DATABASE_URI'] = uri
@@ -23,6 +25,8 @@ app = Flask(__name__)
 #                   SESSION_COOKIE_SECURE=True)
 # app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
 
+
+"""uncomment below when in production env """
 with app.app_context():
 
     uri = os.environ.get('DATABASE_URL', 'postgresql:///reddi-senti')
