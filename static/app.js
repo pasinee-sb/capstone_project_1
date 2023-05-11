@@ -1,5 +1,5 @@
-let BASE_URL = "https://reddi-senti.onrender.com";
-
+// let BASE_URL = "https://reddi-senti.onrender.com";
+let BASE_URL = "http://localhost:5000";
 const currentYear = new Date().getFullYear();
 const $yearElement = $("#currentYear");
 $yearElement.text(currentYear);
