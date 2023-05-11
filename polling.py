@@ -97,7 +97,11 @@ def generate_sentiment(name):
 
 def plot_graph(x, y):
     fig, ax = plt.subplots()
-    ax.bar(x, y, width=0.3)
+    if len(x) == 1:
+        width = 0.1
+    else:
+        width = 0.2
+    ax.bar(x, y, width=width)
     plt.xticks(rotation=45)
 
     buffer = io.BytesIO()
