@@ -1,4 +1,4 @@
-let BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+let BASE_URL = "https://reddi-senti.onrender.com";
 
 const currentYear = new Date().getFullYear();
 const $yearElement = $("#currentYear");
@@ -50,6 +50,7 @@ async function add_word(evt) {
     {
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
     }
   );
