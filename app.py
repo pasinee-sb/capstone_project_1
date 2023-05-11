@@ -1,6 +1,6 @@
 from polling import generate_sentiment, plot_graph
 from typing import List
-from flask import Flask, request, render_template, redirect, session, g, flash
+from flask import Flask, request, jsonify, render_template, redirect, session, g, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, AnalysisCard, db, connect_db, Keyword, SentimentScore, Auth
 from forms import KeywordForm, UserForm, LoginForm, AnalyzeForm, UserEditForm
@@ -56,9 +56,7 @@ debug = DebugToolbarExtension(app)
 ##############################################################################
 # User signup/login/logout
 
-#    @app.before_request""" is a decorator in Flask that registers a function to be called before each request
-# is processed by the server. This can be used to perform tasks that
-#  should be done for every request, such as setting up a database connection,
+#    @app.before_request"""done for every request, such as
 # checking if the user is logged in, or modifying the request object."""
 
 
@@ -68,10 +66,6 @@ def add_user_to_g():
 
     if CURR_USER_KEY in session:
 
-        # The g object in Flask is a global object that can be used to store data during the lifetime of a request.
-        # It is often used to store objects that need to be accessed by multiple functions during the handling of a request.
-        # The g object is specific to each request and is not shared between different requests.
-        # It is created at the start of a request and destroyed at the end of the request.
         g.user = User.query.get(session[CURR_USER_KEY])
 
     else:
@@ -170,7 +164,6 @@ def user_profile(user_id):
 def machine(user_id):
     """render Analyze machine for user if logged in else, return to root page"""
     if g.user.id == user_id:
-
         add_keyword_form = KeywordForm()
         form = AnalyzeForm()
 
@@ -209,20 +202,33 @@ def log_out():
     return redirect('/')
 
 
-@app.route('/add_keyword')
+@ app.route('/demo')
+def demo():
+    """render demo """
+    add_keyword_form = KeywordForm()
+    form = AnalyzeForm()
+
+    return render_template('machine.html',  add_keyword_form=add_keyword_form, form=form)
+
+
+@app.route('/session')
+def get_session():
+    keywords = session.get('keywords', [])
+    return jsonify({'keywords': keywords})
+
+
+@app.route('/add_keyword', methods=['POST'])
 def add_keyword():
     """Add keyword to the keyword list"""
-    keyword = request.args.get('word')
+    keyword = request.json["word"]
     keywords = session.get('keywords', [])
     keywords.append(keyword)
     session['keywords'] = keywords
 
-    if g.user:
-        return redirect('/')
-    return redirect('/demo')
+    return jsonify({'keywords': keywords})
 
 
-@app.route('/remove_keyword/<keyword>')
+@app.route('/remove_keyword/<keyword>', methods=['POST'])
 def remove_keyword(keyword):
     """Remove keyword from keyword list"""
     try:
@@ -243,7 +249,7 @@ def analyze():
     """Analyze keyword by calculating sentiment scores"""
     # Get a list of keywords from checkbox values
     selected_keywords = request.args.getlist('keywords[]')
-    err = "Unable to calculate score. Please ensure the keyword is spelled correctly or try a different keyword."
+    err = "Unable to calculate score."
     results = []
 
     for word in selected_keywords:
@@ -264,7 +270,8 @@ def analyze():
     elif not g.user:
 
         if err in results:
-            flash(err, "danger")
+            flash(
+                f"{err} Please ensure the keyword is spelled correctly or try a different keyword.", "danger")
             flash("Sign up or Log in to save result", "warning")
             return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
 
@@ -282,7 +289,8 @@ def analyze():
     # If a logged in user, show results and show graph plotted according to calculation, if any errors then show errors
     elif g.user:
         if err in results:
-            flash(err, "danger")
+            flash(
+                f"{err} Please ensure the keyword is spelled correctly or try a different keyword.", "danger")
             return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
         else:
 
@@ -410,15 +418,6 @@ def show_user_dashboard(user_id):
 
     flash("Access not allowed", "danger")
     return redirect('/')
-
-
-@ app.route('/demo')
-def demo():
-    """render demo """
-    add_keyword_form = KeywordForm()
-    form = AnalyzeForm()
-
-    return render_template('machine.html',  add_keyword_form=add_keyword_form, form=form)
 
 
 ##############################################################################

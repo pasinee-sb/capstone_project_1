@@ -2,27 +2,32 @@
 
 {%block content%}
 <div class="container mt-5">
-  <h1>Result</h1>
+  <h1 class="display-6">{% if results|length == 1 %}Result{% else %}Results{% endif %}</h1>
+  <hr>
 </div>
-<hr>
+
 
 <div class="col-md-4 w-50 mx-auto mb-10 text-center">
   <img src="data:image/png;base64,{{ image_string }}" alt="graph">
 </div>
 
-<div class="col-lg-6 w-50 mx-auto mt-5 text-center">
 
-  <form method="post" action="/users/{{g.user.id}}/cards" class="col-lg-6 w-50 mx-auto text-center">
+<form method="post" action="/users/{{g.user.id}}/cards">
+  <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+
+
 
     <input type="hidden" name="image_string" value="{{ image_string }}">
 
-    <table class="col-lg-6 w-50 mx-auto text-center">
-      <tr>
-        <th> Keyword</th>
+    <table class="table ">
+      <thead>
+        <tr>
+          <th scope="col"> Keyword</th>
 
-        <th> Sentiment Score</th>
+          <th scope="col"> Sentiment Score</th>
 
-      </tr>
+        </tr>
+      </thead>
       {%for result,word in zip(results, selected_keywords) %}
       <tbody>
         <tr>
@@ -38,45 +43,51 @@
         {%endfor%}
       </tbody>
     </table>
-</div>
 
 
 
 
-<div class="col-md-3 w-30 mx-auto mt-5 text-center">
-  <p class="mt-0">The score represents the degree of positive or negative sentiment conveyed by the text</p>
-  <p class="mt-0"> -1 : very negative sentiment</p>
-  <p class="mt-0"> 0 : neutral sentiment</p>
-  <p class="mt-0">+1 : very positive sentiment</p>
-</div>
+    <div class="col-lg-6 w-50 mx-auto text-center">
+      <p class="lead">Score Key:</p>
+      <dl class="row">
+        <dt class="col-sm-3">-1</dt>
+        <dd class="col-sm-9">very negative sentiment</dd>
+        <dt class="col-sm-3">0</dt>
+        <dd class="col-sm-9"> neutral sentiment</dd>
+        <dt class="col-sm-3">1</dt>
+        <dd class="col-sm-9">very positive sentiment</dd>
+      </dl>
+    </div>
 
 
-{%if not g.user%}
+    {%if not g.user%}
 
-<div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
 
-  <a class="px-3 me-2 btn btn-primary" href="/signup" role="button">Sign up</a>
+      <a class="px-3 me-2 btn btn-primary" href="/signup" role="button">Sign up</a>
 
 
-  <a class="px-3 me-2 btn btn-success" href="/login" role="button">Log in</a>
-</div>
+      <a class="px-3 me-2 btn btn-success" href="/login" role="button">Log in</a>
+    </div>
 
-{%else%}
+    {%else%}
 
-<div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-  <input type="text" name="theme" id="" placeholder="Name result theme" required>
-  <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-    <button type="submit" class="btn btn-success">Save this result</button>
+    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+      <input type="text" name="theme" id="" placeholder="Name result theme" required>
+      <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
+        <button type="submit" class="btn btn-success">Save this result</button>
+      </div>
+
+
+      {%endif%}
+    </div>
+
+
+
+
+
+
   </div>
-
-
-  {%endif%}
-</div>
-
-
-
-
-
 </form>
 
 

@@ -3,16 +3,17 @@
 {%block content%}
 
 <div class="container mt-5">
-  <h1>Analyze Machine</h1>
+  <h1 class="display-5">Analyze Machine</h1>
+  <hr>
 </div>
-<hr>
+
 <div class="col-lg-6 w-50 mx-auto">
 
-  <h2>Add Keyword</h2>
-  <form " action=" {{ url_for('add_keyword') }}">
+  <h2 class="display-6">Add Keyword</h2>
+  <form method="post" id="add_keyword" action="{{ url_for('add_keyword') }}">
     {{ add_keyword_form.hidden_tag() }}
     {{ add_keyword_form.word(class="form-control") }}
-    <button type="submit" class="btn btn-info mt-2">Add</button>
+    <button id="add_keyword_btn" type="submit" class="btn btn-info mt-2">Add</button>
   </form>
   <hr>
 </div>
@@ -20,24 +21,18 @@
 
 
 
-{%if 'keywords' in session%}
-<div class="col-lg-6 w-50 mx-auto">
-  <h2>Check keyword to analyze</h2>
-  <form action="{{ url_for('analyze') }}">
 
-    {% for word in session['keywords'] %}
-    <p>
-      <label>
-        <input type="checkbox" name="keywords[]" value="{{ word }}">
-        {{ word }}
-      </label>
-      <a href="{{ url_for('remove_keyword', keyword=word) }}"><i class="fa-solid fa-trash-can text-danger"></i></a>
-    </p>
-    {% endfor %}
-    </ul>
+<div class="col-lg-6 w-50 mx-auto select_word">
+  <p class="lead">Select the keyword(s) you want to analyze:</p>
+  <form id="analyze_form" action="{{ url_for('analyze') }}">
+    <div id="checkboxes">
+
+
+
+    </div>
     <button type="submit" class="btn btn-success">Analyze</button>
   </form>
 </div>
 
-{%endif%}
+
 {%endblock%}

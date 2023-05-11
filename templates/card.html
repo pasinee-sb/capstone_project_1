@@ -14,10 +14,10 @@
 
 
 <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-    <table class="col-lg-6 w-50 mx-auto text-center">
+    <table class="table">
         <tr>
-            <th> Keyword</th>
-            <th> Sentiment Score</th>
+            <th scope="col"> Keyword</th>
+            <th scope="col"> Sentiment Score</th>
 
 
         </tr>
@@ -34,28 +34,25 @@
 <hr>
 <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
 
-    <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-        <p>The score represents the degree of positive or negative sentiment conveyed by the text</p>
+    <div class="col-lg-6 w-50 mx-auto text-center">
+        <p class="lead">Score Key:</p>
 
-        <table class="col-lg-6 w-50 mx-auto text-center">
-            <tbody>
-                <tr>
-                    <td>-1: </td>
-                    <td> very negative sentiment</td>
+        <dl class="row">
+            <dt class="col-sm-3 fw-normal">
+                -1
+            </dt>
+            <dd class="col-sm-9 "> very negative sentiment</dd>
+            <dt class="col-sm-3 fw-normal">0</dt>
+            <dd class="col-sm-9 ">
+                neutral sentiment
+            </dd>
+            <dt class="col-sm-3 fw-normal">1</dt>
+            <dd class="col-sm-9">very positive sentiment</dd>
 
-                </tr>
-                <tr>
-                    <td> 0:</td>
-                    <td> neutral sentiment </td>
 
-                </tr>
 
-                <tr>
-                    <td> 1:</td>
-                    <td>very positive sentiment</td>
-                </tr>
-            </tbody>
-        </table>
+
+        </dl>
 
 
     </div>
