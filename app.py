@@ -96,14 +96,20 @@ def do_logout():
 @app.route('/')
 def home():
     """Show homepage
-    - anon users: not logged in
-    -logged in : show keyword input form"""
+    - index.html: not logged in
+    -redirect to user's page that shows Analyze machine : logged in"""
     if g.user:
         # show saved analysis cards
 
         return redirect(f"/users/{g.user.id}")
 
     return render_template('index.html')
+
+
+@ app.route('/about')
+def about():
+    """render about page"""
+    return render_template('about.html')
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -118,29 +124,51 @@ def signup():
     form = UserForm()
 
     if form.validate_on_submit():
-        try:
-            user = User.register(
-                username=form.username.data,
-                email=form.email.data,
-                password=form.password.data
-            )
-            db.session.add(user)
-            db.session.commit()
 
-        except IntegrityError:
-            flash("Username already taken", 'danger')
-            return render_template('register.html', form=form)
-
+        user = User.register(
+            username=form.username.data,
+            email=form.email.data,
+            password=form.password.data
+        )
+        db.session.add(user)
+        db.session.commit()
         do_login(user)
-
+        flash('Your account has been created!', 'success')
         return redirect("/")
 
     else:
         return render_template('register.html', form=form)
 
 
+@ app.route('/users/<int:user_id>/profile', methods=['GET', 'POST'])
+def user_profile(user_id):
+    """users may edit or delete own account"""
+    if g.user.id == user_id:
+        form = UserEditForm(obj=g.user)
+
+        if form.validate_on_submit():
+            user = User.authenticate(g.user.username, form.password.data)
+
+            if user:
+                g.user.username = form.username.data
+                g.user.email = form.email.data
+                db.session.commit()
+                flash("User edited", "success")
+                return redirect('/')
+
+            else:
+                flash("Edit unauthorized", "danger")
+                return redirect('/')
+
+        return render_template('edit_user.html', form=form)
+
+    flash("Access not allowed", "danger")
+    return redirect('/')
+
+
 @app.route('/users/<int:user_id>')
 def machine(user_id):
+    """render Analyze machine for user if logged in else, return to root page"""
     if g.user.id == user_id:
 
         add_keyword_form = KeywordForm()
@@ -183,56 +211,20 @@ def log_out():
 
 @app.route('/add_keyword')
 def add_keyword():
+    """Add keyword to the keyword list"""
     keyword = request.args.get('word')
     keywords = session.get('keywords', [])
     keywords.append(keyword)
     session['keywords'] = keywords
-    print(keyword)
 
     if g.user:
         return redirect('/')
     return redirect('/demo')
 
 
-@app.route('/analyze')
-def analyze():
-    selected_keywords = request.args.getlist('keywords[]')
-    err = "Score not calculated, please check spelling or change keyword "
-    results = []
-
-    for word in selected_keywords:
-
-        score = generate_sentiment(word)
-        if score:
-            results.append(score)
-        else:
-
-            results.append(
-                err)
-    if g.user:
-        if err in results:
-            flash(err, "danger")
-            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
-        else:
-
-            image_string = plot_graph(selected_keywords, results)
-
-            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
-    else:
-        if err in results:
-            flash(err, "danger")
-            flash("Sign up or Log in to save result", "warning")
-            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
-
-        else:
-            image_string = plot_graph(selected_keywords, results)
-
-            flash("Sign up or Log in to save result", "warning")
-            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
-
-
 @app.route('/remove_keyword/<keyword>')
 def remove_keyword(keyword):
+    """Remove keyword from keyword list"""
     try:
         keywords = session.get('keywords', [])
         keywords.remove(keyword)
@@ -246,19 +238,79 @@ def remove_keyword(keyword):
     return redirect('/demo')
 
 
+@app.route('/analyze')
+def analyze():
+    """Analyze keyword by calculating sentiment scores"""
+    # Get a list of keywords from checkbox values
+    selected_keywords = request.args.getlist('keywords[]')
+    err = "Unable to calculate score. Please ensure the keyword is spelled correctly or try a different keyword."
+    results = []
+
+    for word in selected_keywords:
+        score = generate_sentiment(word)
+        # If keyword retrieved from API can be used calculate mean sentiment scores
+        # then it can be appended to the results list or else append error message
+        if score:
+            results.append(score)
+        else:
+            results.append(err)
+
+    # Check if user is not logged in and if no keyword is checked on the checkbox then redirect back to the demo page
+    if not g.user and len(selected_keywords) == 0:
+        flash("Please check the keyword(s) to analyze", "danger")
+        return redirect("/demo")
+
+    # Check if not a logged in user, show results and show graph plotted according to calculation, if any errors then show errors
+    elif not g.user:
+
+        if err in results:
+            flash(err, "danger")
+            flash("Sign up or Log in to save result", "warning")
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
+
+        else:
+            image_string = plot_graph(selected_keywords, results)
+
+            flash("Sign up or Log in to save result", "warning")
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
+
+    # If it's a logged in user but no keywords were checked for analysis then redirect to the user's page
+    elif g.user and len(selected_keywords) == 0:
+
+        flash("Please check the keyword(s) to analyze", "danger")
+        return redirect(f"/users/{g.user.id}")
+    # If a logged in user, show results and show graph plotted according to calculation, if any errors then show errors
+    elif g.user:
+        if err in results:
+            flash(err, "danger")
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
+        else:
+
+            image_string = plot_graph(selected_keywords, results)
+
+            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
+
+
 @app.route('/users/<int:user_id>/cards', methods=['POST'])
 def save_results(user_id):
+    """save analysis results to user's dashboard"""
     err = "Result(s) not saved, please check spelling or change keyword "
+
     results = request.form.getlist('results[]')
+
     keywords = request.form.getlist('words[]')
+
     theme = request.form.get('theme')
     image_string = request.form.get('image_string')
 
-    for res in results:
-        if not res.lstrip("-").replace(".", "").isnumeric():
+    # loop through score in results, check if they are numeric or was an error passed on from /analyze
+    # if not numeric value then flash warning for user to go back and change keyword
+    for score in results:
+        if not score.lstrip("-").replace(".", "").isnumeric():
             flash(err, "danger")
             return redirect("/")
 
+    # if all scores are numeric then check if Analysis card's theme name already existed for that user
     existing_card = AnalysisCard.query.filter_by(
         analysis_theme=theme, user_id=user_id).first()
 
@@ -266,13 +318,15 @@ def save_results(user_id):
         flash("Analysis theme is taken, please change the theme", "danger")
 
         return render_template('results.html', results=results, selected_keywords=keywords, zip=zip, image_string=image_string)
-
+    # if not already existing then add that analysis card to database for that user
     else:
         card = AnalysisCard(analysis_theme=theme,
                             user_id=user_id, image_string=image_string)
 
         db.session.add(card)
         db.session.commit()
+
+    # loop through keywords and their matching scores and add them to the analysis card that was created on database
 
     for word, res in zip(keywords, results):
         keyword = Keyword(word=word)
@@ -288,12 +342,15 @@ def save_results(user_id):
 
 @app.route('/users/<int:user_id>/cards/<int:card_id>')
 def show_card(user_id, card_id):
+    """Show analysis card """
+
+    # Check if the logged in user is the same user that owns the card
     if g.user.id == user_id:
 
         card = AnalysisCard.query.get(card_id)
 
         if card in g.user.analysis_card:
-
+            # show card for authorized user
             return render_template('card.html', card=card, user_id=user_id, zip=zip)
 
         else:
@@ -306,7 +363,9 @@ def show_card(user_id, card_id):
 
 @ app.route('/users/<int:user_id>/cards/<int:card_id>/delete', methods=['POST'])
 def delete_card(user_id, card_id):
+    """Delete analysis card"""
 
+    # Check if the person deleting the card is the person who logged in and owns the card
     if g.user.id == user_id:
         card = AnalysisCard.query.get(card_id)
         if card in g.user.analysis_card:
@@ -320,33 +379,10 @@ def delete_card(user_id, card_id):
     return redirect("/")
 
 
-@ app.route('/users/<int:user_id>/profile', methods=['GET', 'POST'])
-def user_profile(user_id):
-    if g.user.id == user_id:
-        form = UserEditForm(obj=g.user)
-
-        if form.validate_on_submit():
-            user = User.authenticate(g.user.username, form.password.data)
-
-            if user:
-                g.user.username = form.username.data
-                g.user.email = form.email.data
-                db.session.commit()
-                flash("User edited", "success")
-                return redirect('/')
-
-            else:
-                flash("Edit unauthorized", "danger")
-                return redirect('/')
-
-        return render_template('edit_user.html', form=form)
-
-    flash("Access not allowed", "danger")
-    return redirect('/')
-
-
 @app.route('/users/<int:user_id>/delete', methods=['POST'])
 def delete_user(user_id):
+    """Delete user"""
+
     if g.user.id == user_id:
         user = User.authenticate(g.user.username, request.form.get('password'))
         if user:
@@ -365,6 +401,8 @@ def delete_user(user_id):
 
 @ app.route('/users/<int:user_id>/dashboard')
 def show_user_dashboard(user_id):
+    """Allows logged in users to view their own dashboard with their saved analysis cards"""
+
     if g.user.id == user_id:
         cards = AnalysisCard.query.filter_by(user_id=user_id).all()
 
@@ -374,14 +412,9 @@ def show_user_dashboard(user_id):
     return redirect('/')
 
 
-@ app.route('/about')
-def about():
-
-    return render_template('about.html')
-
-
 @ app.route('/demo')
 def demo():
+    """render demo """
     add_keyword_form = KeywordForm()
     form = AnalyzeForm()
 

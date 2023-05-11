@@ -1,4 +1,4 @@
-"""Models for Polling app."""
+"""Models for Reddi-Senti app."""
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
@@ -30,7 +30,7 @@ class User(db.Model):
 
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String, nullable=False)
+    username = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, unique=True, nullable=False,)
     auth_id = db.Column(db.Integer, db.ForeignKey(
         'auths.id', ondelete='CASCADE'))
@@ -66,7 +66,7 @@ class User(db.Model):
 
 
 class Keyword(db.Model):
-    """Keyword for polling"""
+    """Keyword """
     __tablename__ = "keywords"
 
     def __repr__(self):
@@ -91,10 +91,11 @@ class AnalysisCard(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey(
         'users.id', ondelete='CASCADE'))
-    created_date = db.Column(db.DateTime, default=db.func.current_timestamp())
+    created_date = db.Column(
+        db.DateTime, default=db.func.date_trunc('minute', db.func.now()))
     image_string = db.Column(db.String)
-    sentiment_score = db.relationship(
-        'SentimentScore', backref='card', cascade='all, delete', overlaps="card,sentiment_score")
+    sentiment_scores = db.relationship(
+        'SentimentScore', back_populates='analysis_card', cascade='all, delete')
 
     # Add a unique constraint to user_id and analysis_theme
     __table_args__ = (db.UniqueConstraint(
@@ -118,7 +119,7 @@ class SentimentScore(db.Model):
     analysis_card_id = db.Column(
         db.Integer, db.ForeignKey('analysis_cards.id', ondelete='CASCADE'))
     analysis_card = db.relationship(
-        'AnalysisCard', backref='sentiment_scores', cascade='all, delete', overlaps="card,sentiment_score")
+        'AnalysisCard', back_populates='sentiment_scores', cascade='all, delete')
 
     created_date = db.Column(db.DateTime, default=db.func.current_timestamp())
 

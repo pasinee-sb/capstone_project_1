@@ -13,6 +13,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">{{card.analysis_theme}}</h5>
+          <span>created date {{card.created_date}}</span>
 
           <a href="/users/{{g.user.id}}/cards/{{card.id}}" class="btn btn-primary">Go to {{card.analysis_theme}}</a>
           <form class="d-inline float-end" action="/users/{{g.user.id}}/cards/{{card.id}}/delete" method="post">

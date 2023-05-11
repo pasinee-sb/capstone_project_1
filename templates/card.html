@@ -3,7 +3,7 @@
 {%block content%}
 
 <div class="col-lg-6 w-50 mx-auto mt-2 text-center">
-    <h3>{{card.analysis_theme}}</h3>
+    <h3>{{card.analysis_theme}} </h3><span>created date {{card.created_date}}</span>
 </div>
 
 
@@ -18,11 +18,13 @@
         <tr>
             <th> Keyword</th>
             <th> Sentiment Score</th>
+
+
         </tr>
-        {%for result,word in zip( card.sentiment_scores,card.keywords) %}
+        {%for result in  card.sentiment_scores %}
         <tbody>
             <tr>
-                <td>{{word.word}}</td>
+                <td>{{result.keywords.word}}</td>
                 <td>{{result.score}}</td>
             </tr>
             {%endfor%}

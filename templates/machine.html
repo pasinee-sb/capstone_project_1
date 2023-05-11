@@ -22,7 +22,7 @@
 
 {%if 'keywords' in session%}
 <div class="col-lg-6 w-50 mx-auto">
-  <h2>Check keywords to analyze</h2>
+  <h2>Check keyword to analyze</h2>
   <form action="{{ url_for('analyze') }}">
 
     {% for word in session['keywords'] %}

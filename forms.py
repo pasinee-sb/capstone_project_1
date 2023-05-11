@@ -4,8 +4,10 @@ from wtforms import SelectField
 from flask_wtf import FlaskForm
 from wtforms_alchemy import ModelForm, model_form_factory
 from wtforms.fields import PasswordField, StringField, SubmitField, FieldList, EmailField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired, Email, ValidationError
 from models import User, SentimentScore, Keyword, db
+from wtforms_alchemy.validators import Unique
+
 
 BaseModelForm = model_form_factory(FlaskForm)
 
@@ -20,6 +22,9 @@ class UserForm(ModelForm):
     """User Form"""
     class Meta:
         model = User
+    username = StringField('username', validators=[DataRequired(), Unique(
+        User.username, message='Username already exists. Please use a different username')])
+
     email = EmailField(validators=[DataRequired(), Email()])
 
     password = PasswordField(validators=[DataRequired()])
@@ -30,6 +35,9 @@ class UserEditForm(ModelForm):
 
     class Meta:
         model = User
+
+    username = StringField('username', validators=[DataRequired(), Unique(
+        User.username, message='Username already exists. Please use a different username')])
     email = EmailField(validators=[DataRequired(), Email()])
 
     password = PasswordField(validators=[DataRequired()])

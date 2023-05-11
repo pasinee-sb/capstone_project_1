@@ -46,7 +46,7 @@ def get_query(keyword: str) -> List[str]:
 
     headers2 = get_request_permission()
 
-    params = {"q": keyword, "t": "year", "limit": 100}
+    params = {"q": keyword, "t": "year", "limit": 200}
 
     response2 = requests.get(
         "https://oauth.reddit.com/search.json", headers=headers2, params=params)
