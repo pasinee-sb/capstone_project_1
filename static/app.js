@@ -1,5 +1,4 @@
-// alert('hi')
-let BASE_URL = "http://localhost:5000";
+let BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
 const currentYear = new Date().getFullYear();
 const $yearElement = $("#currentYear");
