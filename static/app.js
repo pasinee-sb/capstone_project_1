@@ -1,5 +1,6 @@
 let BASE_URL = "https://reddi-senti.onrender.com"; //use when it production env
 // let BASE_URL = "http://localhost:5000"; //use when in development env
+
 const currentYear = new Date().getFullYear();
 const $yearElement = $("#currentYear");
 $yearElement.text(currentYear);
@@ -20,7 +21,12 @@ async function populate_analyze_form(vals) {
     );
     delete_btn.on("click", delete_keyword);
     $("#checkboxes").append(
-      $("<p>").append(checkbox).append(label).append(delete_btn)
+      $("<p>")
+        .append(checkbox)
+        .append("&nbsp;")
+        .append(label)
+        .append("&nbsp;")
+        .append(delete_btn)
     );
   });
 }

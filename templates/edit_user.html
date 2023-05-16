@@ -46,15 +46,17 @@
     </form>
   </div>
 </div>
-<div class="edit-btn-area mt-3 text-center">
-  <form action="{{ url_for('delete_user', user_id=g.user.id) }}" method="post">
-    <p class="mt-5">Enter your password to delete:</p>
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password">
-    <div class="edit-btn-area mt-3 text-center">
-      <button type="submit" class="btn btn-danger">Delete User</button>
-    </div>
-  </form>
+<div class="row justify-content-md-center my-4">
+  <div class="col-md-4">
+    <form action="{{ url_for('delete_user', user_id=g.user.id) }}" method="post">
+
+      <label for="password">Enter your password to delete: </label>
+      <input type="password" id="password" name="password" class="form-control">
+      <div class="edit-btn-area mt-3 text-center">
+        <button type="submit" class="btn btn-danger">Delete User</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {%endblock%}
