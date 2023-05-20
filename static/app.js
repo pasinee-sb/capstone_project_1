@@ -1,5 +1,5 @@
-let BASE_URL = "https://reddi-senti.onrender.com"; //use when it production env
-// let BASE_URL = "http://localhost:5000"; //use when in development env
+// let BASE_URL = "https://reddi-senti.onrender.com"; //use when it production env
+let BASE_URL = "http://localhost:5000"; //use when in development env
 
 const currentYear = new Date().getFullYear();
 const $yearElement = $("#currentYear");
