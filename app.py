@@ -13,7 +13,6 @@ CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 
-"""uncomment below when in development environment"""
 app.app_context().push()
 uri = os.environ.get('DATABASE_URL', 'postgresql:///reddi-senti')
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
@@ -28,22 +27,6 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
 
-"""uncomment below when in production env """
-# with app.app_context():
-
-#     uri = os.environ.get('DATABASE_URL', 'postgresql:///reddi-senti')
-
-#     if uri.startswith("postgres://"):
-#         uri = uri.replace("postgres://", "postgresql://", 1)
-#     app.config['SQLALCHEMY_DATABASE_URI'] = uri
-
-#     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-#     app.config["SQLALCHEMY_ECHO"] = True
-#     app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', 'mycapstone1')
-#     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-#     app.config.update(SESSION_COOKIE_SAMESITE="None",
-#                       SESSION_COOKIE_SECURE=True)
-#     app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
 
 
 # connect to database
@@ -100,7 +83,7 @@ def home():
     -redirect to user's page that shows Analyze machine : logged in"""
     if g.user:
         # show saved analysis cards
-
+        keywords = session.get('keywords', []) 
         return redirect(f"/users/{g.user.id}")
 
     return render_template('index.html')
@@ -213,6 +196,7 @@ def demo():
     """render demo """
     add_keyword_form = KeywordForm()
     form = AnalyzeForm()
+   
 
     return render_template('machine.html',  add_keyword_form=add_keyword_form, form=form)
 
@@ -230,6 +214,7 @@ def add_keyword():
     keywords = session.get('keywords', [])
     keywords.append(keyword)
     session['keywords'] = keywords
+    session.modified = True
 
     return jsonify({'keywords': keywords})
 
@@ -241,6 +226,8 @@ def remove_keyword(keyword):
         keywords = session.get('keywords', [])
         keywords.remove(keyword)
         session['keywords'] = keywords
+        session.modified = True
+       
 
     except ValueError:
         pass

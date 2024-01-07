@@ -55,6 +55,9 @@ class KeywordForm(ModelForm):
     class Meta:
         model = Keyword
 
+     # Override the 'word' field to add a placeholder
+    word = StringField('Word', render_kw={'placeholder': 'Enter a keyword'})    
+
 
 class AnalyzeForm(FlaskForm):
     keywords = FieldList(StringField('Keyword', validators=[

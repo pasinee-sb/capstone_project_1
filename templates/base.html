@@ -64,14 +64,28 @@
   <div class="col-lg-6 w-50 mx-auto text-center alert alert-{{ category }}">
     {{ message }}
   </div>
-  {% endfor %} {%block content%} {%endblock%}
+  {% endfor %}
+  <div class="mb-5"> {%block content%} {%endblock%}</div>
+
   <footer class="bg-light text-center text-lg-start mt-auto">
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
+
+    <div class="text-center p-2 " style="background-color: rgba(0, 0, 0, 0.2)">
+      <div class=" text-center disclaimer">
+
+        <p class="font-italic"><span class="fw-bold text-danger"> Disclaimer: </span>ReddiSenti is designed for
+          educational and developmental
+          purposes in the realm of web app development with Flask and Python. While providing score-based analysis and
+          comparative graphs, it's important to note that accurately predicting sentiment is a complex task that extends
+          beyond the scope of this application.</p>
+        </p>
+      </div>
       <p>
-        &copy;<span id="currentYear"></span> Copyright:
+        &copy;<span>2023-2024</span>
         <a class="text-dark text-decoration-none" href="https://www.linkedin.com/in/pasinee-sb/" target="_blank">
           <b>Pasinee S.</b>
         </a>
+        <a href="https://github.com/pasinee-sb/capstone_project_1" target="_blank"><i
+            class="fa-brands fa-github"></i></a>
       </p>
     </div>
   </footer>
