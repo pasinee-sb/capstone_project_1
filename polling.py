@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 import base64
+import re
 
 
 def authenticate_reddit():
@@ -40,6 +41,32 @@ def get_request_permission():
 
     return headers2
 
+def preprocess_text(text):
+    if not isinstance(text, str):
+        # Handle non-string data (e.g., skip or log)
+        # print(f"Skipping non-string input: {text}")
+        return None
+    # Remove URLs using a regular expression
+    text = re.sub(r'http\S+', '', text)
+
+    # Remove emojis using a regular expression
+    text = re.sub(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF\U0001FB00-\U0001FBFF\U0001F004]+', '', text)
+
+    # Remove special characters and punctuation (except spaces)
+    text = re.sub(r'[^A-Za-z0-9\s]+', '', text)
+
+    # Remove extra whitespaces
+    text = ' '.join(text.split())
+
+    return text
+
+def preprocess_dict(input_dict):
+    # Process individual values within the dictionary
+    for key, value in input_dict.items():
+        if isinstance(value, str):
+            input_dict[key] = preprocess_text(value)
+    
+    return input_dict
 
 def get_query(keyword: str) -> List[str]:
     """get reddit list of reddit posts associated to keyword"""
@@ -52,19 +79,21 @@ def get_query(keyword: str) -> List[str]:
         "https://oauth.reddit.com/search.json", headers=headers2, params=params)
 
     data = response2.json()
-    posts = data['data']['children']
-    after_key = data['data']['after']
-    before_key = data['data']['before']
+    children = data['data']['children']
+    # after_key = data['data']['after']
+    # before_key = data['data']['before']
 
     posts = []
-    for item in data["data"]["children"]:
+    for item in children:
         post = {
             "title": item["data"]["title"],
             "selftext": item["data"]["selftext"]
         }
+        # Preprocess the title and selftext within the post dictionary
+        post = preprocess_dict(post)
+        # preprocess_text(post)
         posts.append(post['title'])
         posts.append(post['selftext'])
-
     return (posts)
 
 
@@ -74,6 +103,7 @@ def get_sentiment(all_posts: List[str]) -> List[float]:
     for post in all_posts:
         blob = TextBlob(post)
         sentiment_scores.append(blob.sentiment.polarity)
+ 
 
     return sentiment_scores
 
@@ -83,7 +113,7 @@ def get_mean_score(scores):
 
     try:
         average_score = mean(scores)
-        return round(average_score, 2)
+        return round(average_score, 3)
     except StatisticsError:
         return None
 

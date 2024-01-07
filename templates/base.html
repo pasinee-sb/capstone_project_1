@@ -27,11 +27,7 @@
           <li class="nav-item active px2">
             <a class="nav-link text-light" aria-current="page" href="/">Home</a>
           </li>
-          {%if g.user%}
-          <li class="nav-item px-2">
-            <a class="nav-link text-light " href="/about">About</a>
-          </li>
-          {%endif%}
+
         </ul>
         {% if not g.user %}
         <div class="d-flex align-items-center">
@@ -42,9 +38,9 @@
         </div>
         {% else %}
         <div class="d-flex align-items-center">
-          <a class="px-3 me-2 btn btn-success" href="/users/{{g.user.id}}/profile" role="button">{{g.user.username}}</a>
-          <a class="px-3 me-2 btn btn-primary" href="/users/{{g.user.id}}/dashboard" role="button">Dashboard</a>
           <a class="px-3 me-2 btn btn-primary" href="/users/{{g.user.id}}" role="button">Analyze Machine</a>
+          <a class="px-3 me-2 btn btn-primary" href="/users/{{g.user.id}}/dashboard" role="button">Dashboard</a>
+          <a class="px-3 me-2 btn btn-success" href="/users/{{g.user.id}}/profile" role="button">{{g.user.username}}</a>
           <a class="px-3 me-2 btn btn-danger" href="/logout" role="button">Log out
           </a>
         </div>
@@ -94,9 +90,7 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 
-  <!-- //make app.js to be relative to the current URL,because a logged and none-logged in users have different route in rendering: -->
 
-  <script src="../static/app.js"></script>
 </body>
 
 </html>

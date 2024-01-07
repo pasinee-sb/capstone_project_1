@@ -24,6 +24,7 @@ app.config.update(SESSION_COOKIE_SAMESITE="None",
                   SESSION_COOKIE_SECURE=True)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SESSION_TYPE'] = 'filesystem'
 
 
 
@@ -47,6 +48,10 @@ debug = DebugToolbarExtension(app)
 
 #    @app.before_request"""done for every request, such as
 # checking if the user is logged in, or modifying the request object."""
+
+
+# Initialize a list to store keywords
+keywords = []
 
 
 @app.before_request
@@ -76,23 +81,15 @@ def do_logout():
         session.clear()
 
 
+
+
 @app.route('/')
 def home():
-    """Show homepage
-    - index.html: not logged in
-    -redirect to user's page that shows Analyze machine : logged in"""
-    if g.user:
-        # show saved analysis cards
-        keywords = session.get('keywords', []) 
-        return redirect(f"/users/{g.user.id}")
+    """Show homepage"""
+
 
     return render_template('index.html')
 
-
-@ app.route('/about')
-def about():
-    """render about page"""
-    return render_template('about.html')
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -196,100 +193,88 @@ def demo():
     """render demo """
     add_keyword_form = KeywordForm()
     form = AnalyzeForm()
+
    
 
-    return render_template('machine.html',  add_keyword_form=add_keyword_form, form=form)
+    return render_template('machine.html',  add_keyword_form=add_keyword_form, form=form,keywords=keywords)
 
-
-@app.route('/session')
-def get_session():
-    keywords = session.get('keywords', [])
-    return jsonify({'keywords': keywords})
 
 
 @app.route('/add_keyword', methods=['POST'])
 def add_keyword():
     """Add keyword to the keyword list"""
-    keyword = request.json["word"]
-    keywords = session.get('keywords', [])
+    keyword = request.form["word"]
+  
     keywords.append(keyword)
-    session['keywords'] = keywords
-    session.modified = True
-
-    return jsonify({'keywords': keywords})
-
-
-@app.route('/remove_keyword/<keyword>', methods=['POST'])
-def remove_keyword(keyword):
-    """Remove keyword from keyword list"""
-    try:
-        keywords = session.get('keywords', [])
-        keywords.remove(keyword)
-        session['keywords'] = keywords
-        session.modified = True
-       
-
-    except ValueError:
-        pass
-
-    if g.user:
-        return redirect('/')
+    
     return redirect('/demo')
+
+
+
+
+@app.route('/clear_keywords', methods=['POST'])
+def clear_keywords():
+    """Clear all keywords from the session."""
+  
+    global keywords
+    keywords.clear()
+    if g.user :
+        return redirect(f"/users/{g.user.id}")
+    else :
+        return redirect('/demo')
+
 
 
 @app.route('/analyze')
 def analyze():
-    """Analyze keyword by calculating sentiment scores"""
-    # Get a list of keywords from checkbox values
-    selected_keywords = request.args.getlist('keywords[]')
+    """Analyze keywords by calculating sentiment scores."""
+    
+    global keywords
     err = "Unable to calculate score."
     results = []
 
-    for word in selected_keywords:
+    # Calculate sentiment scores for each keyword
+    for word in keywords:
         score = generate_sentiment(word)
-        # If keyword retrieved from API can be used calculate mean sentiment scores
-        # then it can be appended to the results list or else append error message
-        if score:
-            results.append(score)
-        else:
-            results.append(err)
+        results.append(score if score else err)
 
-    # Check if user is not logged in and if no keyword is checked on the checkbox then redirect back to the demo page
-    if not g.user and len(selected_keywords) == 0:
-        flash("Please check the keyword(s) to analyze", "danger")
-        return redirect("/demo")
-
-    # Check if not a logged in user, show results and show graph plotted according to calculation, if any errors then show errors
-    elif not g.user:
+    # Check if user is not logged in
+    if not g.user:
+        if not keywords:
+            flash("Please add keyword(s) to analyze", "danger")
+            return redirect("/demo")
 
         if err in results:
-            flash(
-                f"{err} Please ensure the keyword is spelled correctly or try a different keyword.", "danger")
-            flash("Sign up or Log in to save result", "warning")
+            flash(f"{err} Please check spelling or try a different keyword.", "danger")
+            selected_keywords = keywords.copy()
+            keywords.clear()
             return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
-
         else:
-            image_string = plot_graph(selected_keywords, results)
-
+            image_string = plot_graph(keywords, results)
             flash("Sign up or Log in to save result", "warning")
+            selected_keywords = keywords.copy()
+            # Clear the global keywords list after analysis
+            keywords.clear()
             return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
 
-    # If it's a logged in user but no keywords were checked for analysis then redirect to the user's page
-    elif g.user and len(selected_keywords) == 0:
-
-        flash("Please check the keyword(s) to analyze", "danger")
+    # User is logged in
+    if not keywords:
+        flash("Please add keyword(s) to analyze", "danger")
         return redirect(f"/users/{g.user.id}")
-    # If a logged in user, show results and show graph plotted according to calculation, if any errors then show errors
-    elif g.user:
-        if err in results:
-            flash(
-                f"{err} Please ensure the keyword is spelled correctly or try a different keyword.", "danger")
-            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip)
-        else:
 
-            image_string = plot_graph(selected_keywords, results)
+    if err in results:
+        flash(f"{err} Please check spelling or try a different keyword.", "danger")
+        return render_template('results.html', results=results, selected_keywords=keywords, zip=zip)
+    else:
+        image_string = plot_graph(keywords, results)
+        selected_keywords = keywords.copy()
 
-            return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
+        # Clear the global keywords list after analysis
+        keywords.clear()
+  
+
+        return render_template('results.html', results=results, selected_keywords=selected_keywords, zip=zip, image_string=image_string)
+
 
 
 @app.route('/users/<int:user_id>/cards', methods=['POST'])

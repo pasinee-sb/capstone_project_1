@@ -4,6 +4,12 @@
 
 <div class="container mt-5">
   <h1 class="display-5">Analyze Machine</h1>
+  <p><b>How to use : </b> Insert a group of keywords that share a common theme that you would like to compare sentiments
+    ex.
+    Sprite vs
+    Pepsi vs
+    Coca Cola, Trump vs
+    Obama vs Biden, etc.</p>
   <hr>
 </div>
 
@@ -13,7 +19,7 @@
   <form method="post" id="add_keyword" action="{{ url_for('add_keyword') }}">
     {{ add_keyword_form.hidden_tag() }}
     {{ add_keyword_form.word(class="form-control") }}
-    <button id="add_keyword_btn" type="submit" class="btn btn-info mt-2">Add</button>
+    <button id="add_keyword_btn" type="submit" class="btn btn-primary mt-2">Add</button>
   </form>
   <hr>
 </div>
@@ -23,14 +29,19 @@
 
 
 <div class="col-lg-6 w-50 mx-auto select_word">
-  <p class="lead">Select the keyword(s) you want to analyze:</p>
-  <form id="analyze_form" action="{{ url_for('analyze') }}">
-    <div id="checkboxes">
 
+  <h2 class="lead display-6">Keywords:</h2>
+  <ul>
+    {% for keyword in keywords %}
+    <li>{{ keyword }}</li>
+    {% endfor %}
+  </ul>
 
-
-    </div>
-    <button type="submit" class="btn btn-success my-2">Analyze</button>
+  <form action="/analyze" method="get">
+    <button type="submit" class="btn btn-success">Analyze</button>
+  </form>
+  <form action="/clear_keywords" method="post" class="mt-2">
+    <button type="submit" class="btn btn-danger">Clear</button>
   </form>
 </div>
 
