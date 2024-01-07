@@ -24,6 +24,8 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config.update(SESSION_COOKIE_SAMESITE="None",
                   SESSION_COOKIE_SECURE=True)
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', False)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 
 
 """uncomment below when in production env """

@@ -1,3 +1,16 @@
 .fa-trash-can {
   color: red;
 }
+.bg-warning-subtle {
+  background-color: #fff3cd; /* Choose a color that stands out */
+  border-left: 5px solid #ffc107; /* Add a left border for emphasis */
+  padding: 15px;
+  margin-bottom: 20px;
+}
+.list-group-item {
+  background-color: #f8f9fa; /* Light background */
+  border-left: 4px solid #007bff; /* Colored left border */
+  margin-bottom: 10px; /* Space between items */
+  padding: 15px; /* Inner spacing */
+  border-radius: 5px; /* Rounded corners */
+}
